@@ -16,6 +16,13 @@ Have a GIF that's just a tad too slow or fast? Like one particular frame of a GI
 Want to make a GIF slideshow out of your family pictures?
 Look no further than _gifRender_!
 
+### Why gifRender?
+
+I decided to create _gifRender_ as a natural continuation of [my previous project](https://github.com/VictorVy/myGallery),
+a media gallery program equipped with a tagging system and search functionality. One of the planned features for this
+project was a simple image, GIF, and/or video editing tool. It ended up falling outside the scope of the project,
+so I decided this would be a good opportunity to create a new project that would focus on this feature, starting with GIFs.
+
 ### User stories
 
 - As a user, I want to be able to add an arbitrary number of images to a list called a roster
