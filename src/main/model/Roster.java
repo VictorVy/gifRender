@@ -20,4 +20,16 @@ public class Roster {
     public boolean isEmpty() {
         return roster.isEmpty();
     }
+
+    public int size() {
+        return roster.size();
+    }
+
+    public RosterItem getItem(int i) {
+        return roster.get(i);
+    }
+
+    public ArrayList<RosterItem> getItems() {
+        return roster;
+    }
 }

@@ -1,9 +1,14 @@
 package ui;
 
 import model.Roster;
+import model.RosterItem;
 
+import javax.imageio.ImageIO;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class Main {
@@ -14,7 +19,7 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        System.out.print("Welcome to gifRender!\n"
+        System.out.print("Welcome to gifRender.\n"
                 + "To view the manual, type \"man\".\n"
                 + "Happy rending!\n");
 
@@ -77,16 +82,41 @@ public class Main {
     private static void viewRoster() {
         if (roster.isEmpty()) {
             System.out.println("Your roster is empty!");
+        } else {
+            System.out.println("Roster:");
+            for (int i = 0; i < roster.size(); i++) {
+                RosterItem ri = roster.getItem(i);
+                System.out.println("\nIndex " + i + "\n\t" + ri.getName());
+            }
         }
     }
 
     private static void addItem(String inputPath) {
         Path path = Path.of(inputPath);
-        System.out.println(path.toAbsolutePath());
+        File file = path.toFile();
+
+        try {
+            if (!file.exists() || !isImageOrGif(file.getName())) {
+                throw new InvalidPathException(inputPath, "Invalid input path!");
+            }
+
+            System.out.println(file.getName() + " added to index " + roster.size() + ".");
+            roster.add(new RosterItem(ImageIO.read(file), file.getName()));
+        } catch (InvalidPathException e) {
+            System.out.println("Invalid file path!");
+        } catch (IOException e) {
+            System.out.println("Error reading file!");
+        }
     }
 
     private static void removeItem(int index) {
+        System.out.println(roster.getItem(index).getName() + " was removed from index " + index + ".");
         roster.remove(index);
+    }
+
+    public static Boolean isImageOrGif(String name) {
+        String n = name.toLowerCase();
+        return n.endsWith("png") || n.endsWith("jpg") || n.endsWith("bmp") || n.endsWith("gif");
     }
 }
 
