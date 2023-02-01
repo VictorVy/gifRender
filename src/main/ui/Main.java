@@ -3,13 +3,15 @@ package ui;
 import model.Roster;
 import model.RosterItem;
 
-import javax.imageio.ImageIO;
+//import javax.imageio.ImageIO;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+
+import com.icafe4j.image.ImageIO;
 
 public class Main {
     private static Roster roster;
@@ -100,12 +102,14 @@ public class Main {
                 throw new InvalidPathException(inputPath, "Invalid input path!");
             }
 
-            System.out.println(file.getName() + " added to index " + roster.size() + ".");
             roster.add(new RosterItem(ImageIO.read(file), file.getName()));
+            System.out.println(file.getName() + " added to index " + (roster.size() - 1) + ".");
         } catch (InvalidPathException e) {
             System.out.println("Invalid file path!");
         } catch (IOException e) {
             System.out.println("Error reading file!");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

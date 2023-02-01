@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="CheckStyle-IDEA-Module">
-    <option name="configuration">
-      <map />
-    </option>
+  <component name="CheckStyle-IDEA-Module" serialisationVersion="2">
+    <option name="activeLocationsIds" />
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
@@ -29,5 +27,10 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" exported="" name="icafe" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-log4j12-1.7.12" level="project" />
+    <orderEntry type="library" exported="" name="log4j-1.2.17" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.12" level="project" />
+    <orderEntry type="library" exported="" name="jai_imageio" level="project" />
   </component>
 </module>

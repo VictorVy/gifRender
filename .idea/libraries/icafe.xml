@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="icafe">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/icafe.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/icafe.jar!/doc" />
+      <root url="https://github.com/dragon66/icafe/wiki" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
