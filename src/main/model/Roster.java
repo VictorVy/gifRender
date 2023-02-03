@@ -1,6 +1,9 @@
 package model;
 
+import com.icafe4j.image.gif.GIFFrame;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Roster {
     ArrayList<RosterItem> roster;
@@ -31,5 +34,11 @@ public class Roster {
 
     public ArrayList<RosterItem> getItems() {
         return roster;
+    }
+
+    public GIFFrame[] getFrames() {
+        Object[] arr = roster.stream().map(ri -> new GIFFrame(ri.getImage())).toArray();
+        //https://stackoverflow.com/questions/12210311/downcasting-of-arrays-in-java
+        return Arrays.copyOf(arr, arr.length, GIFFrame[].class);
     }
 }

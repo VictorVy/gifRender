@@ -1,0 +1,10 @@
+IN PROCESS:
+- complete output functionality
+  - output filename
+  - remember output dir
+
+NEXT:
+- rend gifs
+- download roster items
+- add frame parameters
+- selection handling

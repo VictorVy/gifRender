@@ -1,13 +1,11 @@
 package ui;
 
+import com.icafe4j.image.gif.GIFTweaker;
 import model.Roster;
 import model.RosterItem;
 
 //import javax.imageio.ImageIO;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
@@ -15,45 +13,64 @@ import com.icafe4j.image.ImageIO;
 
 public class Main {
     private static Roster roster;
+    private static Path outputDir;
+    private static BufferedReader br;
+
+    private static final String MANUAL = "man";
+    private static final String EXIT = "exit";
+    private static final String CLEAR = "clear";
+    private static final String VIEW_ROSTER = "vr";
+    private static final String ADD = "add ";
+    private static final String REMOVE = "rm ";
+    private static final String OUTPUT = "out";
 
     public static void main(String[] args) {
-        roster = new Roster();
+        init();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        System.out.print("Welcome to gifRender.\n"
+        System.out.println("Welcome to gifRender.\n"
                 + "To view the manual, type \"man\".\n"
-                + "Happy rending!\n");
+                + "Happy rending!");
 
         while (true) {
-            String input = "";
+            System.out.println("\nEnter command:");
 
             try {
-                input = br.readLine();
+                String input = br.readLine();
+
+                if (input.equals(EXIT)) {
+                    break;
+                }
+
+                handleInput(input);
+
+            } catch (IOException e) {
+                System.out.println("Invalid input!");
+                throw new RuntimeException(e);
             } catch (Exception e) {
-                System.out.println("Error reading input!");
+                e.printStackTrace();
             }
-
-            if (input.equals("exit")) {
-                break;
-            }
-
-            handleInput(input);
         }
 
         System.out.println("Adios!");
     }
 
-    private static void handleInput(String input) {
-        if (input.equals("man")) {
+    private static void init() {
+        roster = new Roster();
+        outputDir = Path.of("nodir");
+
+        br = new BufferedReader(new InputStreamReader(System.in));
+    }
+
+    private static void handleInput(String input) throws Exception {
+        if (input.equals(MANUAL)) {
             printManual();
-        } else if (input.equals("clear")) {
+        } else if (input.equals(CLEAR)) {
             clearScreen();
-        } else if (input.equals("vr")) {
+        } else if (input.equals(VIEW_ROSTER)) {
             viewRoster();
-        } else if (input.startsWith("add ")) {
+        } else if (input.startsWith(ADD)) {
             addItem(input.substring(4));
-        } else if (input.startsWith("rm ")) {
+        } else if (input.startsWith(REMOVE)) {
             try {
                 removeItem(Integer.parseInt(input.substring(3)));
             } catch (NumberFormatException e) {
@@ -61,6 +78,8 @@ public class Main {
             } catch (IndexOutOfBoundsException e) {
                 System.out.println("Item doesn't exist!");
             }
+        } else if (input.equals(OUTPUT)) {
+            outputRoster();
         } else {
             System.out.println("Invalid command!");
         }
@@ -68,12 +87,13 @@ public class Main {
 
     private static void printManual() {
         System.out.println("Available commands:\n\n"
-                + "manual\n\tPrints this manual.\n\n"
-                + "clear\n\tClears the screen.\n\n"
-                + "exit\n\tExits the program.\n\n"
-                + "vr\n\tView items in the image roster.\n\n"
-                + "add p\n\tAdd the image at path p to the roster.\n\t\tExample: add D:\\Pictures\\example.png\n\n"
-                + "rm i\n\tRemove the item at index i from the roster.\n\t\tExample: rm 0");
+                + MANUAL + "\n\tPrints this manual.\n\n"
+                + CLEAR + "\n\tClears the screen.\n\n"
+                + EXIT + "\n\tExits the program.\n\n"
+                + VIEW_ROSTER + "\n\tView items in the image roster.\n\n"
+                + ADD + "p\n\tAdd the image at path p to the roster.\n\t\tExample: add D:\\Pictures\\example.png\n\n"
+                + REMOVE + "i\n\tRemove the item at index i from the roster.\n\t\tExample: rm 0\n\n"
+                + OUTPUT + "\n\tOutput the roster as a gif.");
     }
 
     private static void clearScreen() {
@@ -82,14 +102,14 @@ public class Main {
     }
 
     private static void viewRoster() {
-        if (roster.isEmpty()) {
-            System.out.println("Your roster is empty!");
-        } else {
-            System.out.println("Roster:");
-            for (int i = 0; i < roster.size(); i++) {
-                RosterItem ri = roster.getItem(i);
-                System.out.println("\nIndex " + i + "\n\t" + ri.getName());
-            }
+        if (rosterIsEmpty()) {
+            return;
+        }
+
+        System.out.println("Roster:");
+        for (int i = 0; i < roster.size(); i++) {
+            RosterItem ri = roster.getItem(i);
+            System.out.println("\nIndex " + i + "\n\t" + ri.getName());
         }
     }
 
@@ -118,7 +138,65 @@ public class Main {
         roster.remove(index);
     }
 
-    public static Boolean isImageOrGif(String name) {
+    private static void outputRoster() throws Exception {
+        if (rosterIsEmpty()) {
+            return;
+        }
+
+        setOutputDir();
+
+        if (confirm("Output GIF to " + outputDir + "?")) {
+            makeGif();
+            System.out.println("GIF created in " + outputDir + "!");
+        }
+    }
+
+    private static void makeGif() throws Exception {
+        System.out.println(roster.size());
+
+        FileOutputStream out = new FileOutputStream(outputDir + "/test.jpg.gif");
+
+        GIFTweaker.writeAnimatedGIF(roster.getFrames(), out);
+    }
+
+    private static void setOutputDir() throws IOException {
+        while (true) {
+            System.out.println("Please specify output directory:");
+            Path input = Path.of(br.readLine());
+
+            if (input.toFile().exists() && input.toFile().isDirectory()) {
+                outputDir = input;
+                break;
+            } else {
+                System.out.println("Invalid output path!");
+            }
+        }
+    }
+
+    private static boolean confirm(String message) throws IOException {
+        System.out.println(message);
+
+        while (true) {
+            System.out.println("Y/N");
+            String answer = br.readLine().toLowerCase();
+
+            if (!answer.equals("y") && !answer.equals("n")) {
+                continue;
+            }
+
+            return answer.equals("y");
+        }
+    }
+
+    private static boolean rosterIsEmpty() {
+        if (roster.isEmpty()) {
+            System.out.println("Your roster is empty!");
+        }
+
+        return roster.isEmpty();
+    }
+
+    private static Boolean isImageOrGif(String name) {
         String n = name.toLowerCase();
         return n.endsWith("png") || n.endsWith("jpg") || n.endsWith("bmp") || n.endsWith("gif");
     }
