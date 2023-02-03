@@ -4,7 +4,6 @@ import com.icafe4j.image.gif.GIFTweaker;
 import model.Roster;
 import model.RosterItem;
 
-//import javax.imageio.ImageIO;
 import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -143,12 +142,16 @@ public class Main {
             return;
         }
 
-        setOutputDir();
-
-        if (confirm("Output GIF to " + outputDir + "?")) {
-            makeGif();
-            System.out.println("GIF created in " + outputDir + "!");
+        if (outputDir.toString().equals("nodir")) {
+            setOutputDir();
         }
+
+        while (!confirm("Output GIF to " + outputDir + "?")) {
+            setOutputDir();
+        }
+
+        makeGif();
+        System.out.println("GIF created in " + outputDir + "!");
     }
 
     private static void makeGif() throws Exception {
@@ -201,4 +204,3 @@ public class Main {
         return n.endsWith("png") || n.endsWith("jpg") || n.endsWith("bmp") || n.endsWith("gif");
     }
 }
-
