@@ -1,14 +1,16 @@
 package ui;
 
+import com.icafe4j.image.ImageIO;
 import com.icafe4j.image.gif.GIFTweaker;
+import com.icafe4j.image.reader.GIFReader;
 import model.Roster;
 import model.RosterItem;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-
-import com.icafe4j.image.ImageIO;
+import java.util.List;
 
 // gifRender application
 public class GifRenderApp {
@@ -78,7 +80,7 @@ public class GifRenderApp {
         } else if (input.equals(viewRosterComm)) {
             viewRoster();
         } else if (input.startsWith(addComm)) {
-            addItem(input.substring(4));
+            addItem(input.substring(addComm.length()));
         } else if (input.startsWith(removeComm)) {
             try {
                 removeItem(Integer.parseInt(input.substring(3)));
@@ -130,16 +132,31 @@ public class GifRenderApp {
         try {
             if (!file.exists() || !isImageOrGif(file.getName())) {
                 throw new InvalidPathException(inputPath, "Invalid input path!");
+            } else if (file.getName().toLowerCase().endsWith("gif")) {
+                addGif(file);
+            } else {
+                roster.add(new RosterItem(ImageIO.read(file), file.getName()));
             }
-
-            roster.add(new RosterItem(ImageIO.read(file), file.getName()));
-            System.out.println(file.getName() + " added to index " + (roster.size() - 1) + ".");
-        } catch (InvalidPathException e) {
+            System.out.println(file.getName() + " added to roster.");
+        } catch (InvalidPathException | FileNotFoundException e) {
             System.out.println("Invalid file path!");
         } catch (IOException e) {
             System.out.println("Error reading file!");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void addGif(File file) throws Exception {
+        FileInputStream inputStream = new FileInputStream(file);
+        String n = file.getName().substring(0, file.getName().lastIndexOf("."));
+
+        GIFReader reader = new GIFReader();
+        reader.read(inputStream);
+        List<BufferedImage> frames = reader.getFrames();
+
+        for (int i = 0; i < frames.size(); i++) {
+            roster.add(new RosterItem(frames.get(i), n + "_" + i + ".png"));
         }
     }
 
@@ -165,7 +182,7 @@ public class GifRenderApp {
         }
 
         makeGif();
-        System.out.println(outputName + ".gif created in " + outputDir + "!");
+        System.out.println(outputName + ".gif created in " + outputDir);
     }
 
     private void makeGif() throws Exception {

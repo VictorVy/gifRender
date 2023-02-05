@@ -1,5 +1,7 @@
+IN PROGRESS:
+- preserve gif frame parameters while rending
+
 NEXT:
-- rend gifs
 - download roster items
-- add frame parameters
+- manipulate frame parameters
 - selection handling
