@@ -2,6 +2,7 @@ package model;
 
 import java.awt.image.BufferedImage;
 
+// Represents a single frame of the output gif
 public class RosterItem {
     private final BufferedImage image;
     private String name;

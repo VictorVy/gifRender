@@ -5,6 +5,7 @@ import com.icafe4j.image.gif.GIFFrame;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// Represents the collection of frames comprising the output gif
 public class Roster {
     ArrayList<RosterItem> roster;
 

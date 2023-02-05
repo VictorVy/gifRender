@@ -10,10 +10,15 @@ import java.nio.file.Path;
 
 import com.icafe4j.image.ImageIO;
 
-public class MainApp {
+// gifRender application
+public class GifRenderApp {
+    private BufferedReader br;
     private Roster roster;
     private Path outputDir;
-    private BufferedReader br;
+    private String outputName;
+
+    private final String noDir = "_nodir_";
+    private final String noName = "_noname_";
 
     private final String manComm = "man";
     private final String exitComm = "exit";
@@ -23,7 +28,7 @@ public class MainApp {
     private final String removeComm = "rm ";
     private final String outputComm = "out";
 
-    public MainApp() {
+    public GifRenderApp() {
         run();
     }
 
@@ -58,10 +63,11 @@ public class MainApp {
     }
 
     private void init() {
-        roster = new Roster();
-        outputDir = Path.of("nodir");
-
         br = new BufferedReader(new InputStreamReader(System.in));
+
+        roster = new Roster();
+        outputDir = Path.of(noDir);
+        outputName = noName;
     }
 
     private void handleInput(String input) throws Exception {
@@ -147,22 +153,23 @@ public class MainApp {
             return;
         }
 
-        if (outputDir.toString().equals("nodir")) {
+        if (outputDir.toString().equals(noDir)) {
             setOutputDir();
         }
-
-        while (!confirm("Output GIF to " + outputDir + "?")) {
+        if (outputName.equals(noName)) {
+            setOutputName();
+        }
+        while (!confirm("Output " + outputName + ".gif to " + outputDir + "?")) {
             setOutputDir();
+            setOutputName();
         }
 
         makeGif();
-        System.out.println("GIF created in " + outputDir + "!");
+        System.out.println(outputName + ".gif created in " + outputDir + "!");
     }
 
     private void makeGif() throws Exception {
-        System.out.println(roster.size());
-
-        FileOutputStream out = new FileOutputStream(outputDir + "/test.jpg.gif");
+        FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName + ".gif");
 
         GIFTweaker.writeAnimatedGIF(roster.getFrames(), out);
     }
@@ -177,6 +184,20 @@ public class MainApp {
                 break;
             } else {
                 System.out.println("Invalid output path!");
+            }
+        }
+    }
+
+    private void setOutputName() throws IOException {
+        while (true) {
+            System.out.println("Please specify output file name:");
+            String input = br.readLine();
+
+            if (isLegalName(input)) {
+                outputName = input;
+                break;
+            } else {
+                System.out.println("Invalid name!");
             }
         }
     }
@@ -204,8 +225,13 @@ public class MainApp {
         return roster.isEmpty();
     }
 
-    private Boolean isImageOrGif(String name) {
+    private boolean isImageOrGif(String name) {
         String n = name.toLowerCase();
         return n.endsWith("png") || n.endsWith("jpg") || n.endsWith("bmp") || n.endsWith("gif");
+    }
+
+    private boolean isLegalName(String n) {
+        return !(n.contains("\\") || n.contains("/") || n.contains(":") || n.contains("*") || n.contains("?")
+                || n.contains("\"") || n.contains("<") || n.contains(">") || n.contains("|"));
     }
 }
