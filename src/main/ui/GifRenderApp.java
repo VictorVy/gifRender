@@ -2,6 +2,7 @@ package ui;
 
 import com.icafe4j.image.ImageIO;
 import com.icafe4j.image.ImageType;
+import com.icafe4j.image.gif.GIFFrame;
 import com.icafe4j.image.gif.GIFTweaker;
 import com.icafe4j.image.reader.GIFReader;
 import model.Roster;
@@ -136,7 +137,7 @@ public class GifRenderApp {
             } else if (file.getName().toLowerCase().endsWith("gif")) {
                 addGif(file);
             } else {
-                roster.add(new RosterItem(ImageIO.read(file), file.getName()));
+                addImage(file);
             }
             System.out.println(file.getName() + " added to roster.");
         } catch (InvalidPathException | FileNotFoundException e) {
@@ -148,17 +149,25 @@ public class GifRenderApp {
         }
     }
 
-    private void addGif(File file) throws Exception {
-        FileInputStream inputStream = new FileInputStream(file);
-        String n = file.getName().substring(0, file.getName().lastIndexOf("."));
+    private void addImage(File file) throws Exception {
+        roster.add(new RosterItem(ImageIO.read(file), file.getName()));
+    }
 
-        GIFReader reader = new GIFReader();
-        reader.read(inputStream);
-        List<BufferedImage> frames = reader.getFrames();
+    private void addGif(File file) throws Exception {
+        String n = file.getName().substring(0, file.getName().lastIndexOf("."));
+        List<GIFFrame> frames = parseGif(file);
 
         for (int i = 0; i < frames.size(); i++) {
             roster.add(new RosterItem(frames.get(i), n + "_" + i + ".png"));
         }
+    }
+
+    private List<GIFFrame> parseGif(File file) throws Exception {
+        FileInputStream inputStream = new FileInputStream(file);
+
+        GIFReader reader = new GIFReader();
+        reader.read(inputStream);
+        return reader.getGIFFrames();
     }
 
     private void removeItem(int index) {

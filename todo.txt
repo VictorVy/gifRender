@@ -3,4 +3,3 @@ IN PROGRESS:
 NEXT:
 - manipulate frame parameters
 - selection handling
-- investigate rent frame parameter preservation
