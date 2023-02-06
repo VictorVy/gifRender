@@ -1,5 +1,6 @@
 IN PROGRESS:
-- manipulate frame parameters
+- figure out delay shenanigans
 
 NEXT:
+- frame renaming
 - selection handling

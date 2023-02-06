@@ -23,6 +23,7 @@ public class GifRenderApp {
     private final String addComm = "add ";
     private final String removeComm = "rm ";
     private final String downloadComm = "down ";
+    private final String delayComm = "d ";
     private final String outputComm = "out";
 
     public GifRenderApp() {
@@ -79,6 +80,8 @@ public class GifRenderApp {
             handleRemove(input.substring(removeComm.length()));
         } else if (input.startsWith(downloadComm)) {
             handleDownload(input.substring(downloadComm.length()));
+        } else if (input.startsWith(delayComm)) {
+            handleDelay(input.substring(delayComm.length()));
         } else if (input.equals(outputComm)) {
             outputRoster();
         } else {
@@ -97,6 +100,8 @@ public class GifRenderApp {
                 + removeComm + "i\n\tRemove the item at index i from the roster."
                 + "\n\t\trm 0\n\t\trm all\n\n"
                 + downloadComm + "i\n\tDownload the item at index i as a png.\n\n"
+                + delayComm + "i\n\tSet the delay of the roster item at index i."
+                + "\n\t\td 0\n\t\td all\n\n"
                 + outputComm + "\n\tOutput the roster as a gif.");
     }
 
@@ -186,28 +191,55 @@ public class GifRenderApp {
     }
 
     private void downloadItem(int index) throws Exception {
-        String outputDir = askOutputDir();
         String itemName = roster.getItem(index).getName();
+        String outputDir = askOutputDir();
 
-        BufferedImage image = roster.getItem(index).getImage();
 
-        confirmOutput("Download " + itemName + " to " + outputDir + "?");
+        if (confirm("Download " + itemName + " to " + outputDir + "?")) {
+            BufferedImage image = roster.getItem(index).getImage();
 
-        IOUtils.writeImage(image, outputDir, itemName);
-        System.out.println(itemName + " created in " + outputDir);
+            IOUtils.writeImage(image, outputDir, itemName);
+            System.out.println(itemName + " created in " + outputDir);
+        }
     }
 
     private void downloadAll() throws Exception {
         String outputDir = askOutputDir();
 
-        confirmOutput("Download all roster items to " + outputDir + "?");
+        if (confirm("Download all roster items to " + outputDir + "?")) {
+            for (int i = 0; i < roster.size(); i++) {
+                RosterItem ri = roster.getItem(i);
+                IOUtils.writeImage(ri.getImage(), outputDir, ri.getName());
+            }
 
-        for (int i = 0; i < roster.size(); i++) {
-            RosterItem ri = roster.getItem(i);
-            IOUtils.writeImage(ri.getImage(), outputDir, ri.getName());
+            System.out.println("Downloaded roster items to " + outputDir);
+        }
+    }
+
+    private void handleDelay(String input) throws IOException {
+        if (input.equals("all")) {
+            setAllDelays();
+        } else {
+            setDelay(Integer.parseInt(input));
+        }
+    }
+
+    private void setDelay(int index) throws IOException {
+        RosterItem ri = roster.getItem(index);
+        int delay = askDelay();
+
+        ri.setDelay(delay);
+        System.out.println("Delay set to " + delay + " ms for " + ri);
+    }
+
+    private void setAllDelays() throws IOException {
+        int delay = askDelay();
+
+        for (RosterItem ri : roster.getItems()) {
+            ri.setDelay(delay);
         }
 
-        System.out.println("Downloaded roster items to " + outputDir);
+        System.out.println("Delay set to " + delay + " ms for all roster items.");
     }
 
     private void outputRoster() throws Exception {
@@ -218,16 +250,9 @@ public class GifRenderApp {
         String outputDir = askOutputDir();
         String outputName = askOutputName();
 
-        confirmOutput("Output " + outputName + ".gif to " + outputDir + "?");
-
-        IOUtils.writeGif(roster.getFrames(), outputDir, outputName);
-        System.out.println(outputName + ".gif created in " + outputDir);
-    }
-
-    private void confirmOutput(String msg) throws IOException {
-        while (!confirm(msg)) {
-            askOutputDir();
-            askOutputName();
+        if (confirm("Output " + outputName + ".gif to " + outputDir + "?")) {
+            IOUtils.writeGif(roster.getFrames(), outputDir, outputName);
+            System.out.println(outputName + ".gif created in " + outputDir);
         }
     }
 
@@ -253,6 +278,23 @@ public class GifRenderApp {
                 return input;
             } else {
                 System.out.println("Invalid name!");
+            }
+        }
+    }
+
+    private int askDelay() throws IOException {
+        while (true) {
+            System.out.println("Please specify delay (ms):");
+            try {
+                int delay = Integer.parseInt(br.readLine());
+
+                if (delay >= 0) {
+                    return delay;
+                }
+
+                throw new NumberFormatException();
+            } catch (NumberFormatException e) {
+                System.out.println("Must be a non-negative integer!");
             }
         }
     }

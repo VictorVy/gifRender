@@ -51,8 +51,6 @@ public class IOUtils {
     }
 
     public static List<GIFFrame> parseGif(File file) throws Exception {
-
-
         FileInputStream inputStream = new FileInputStream(file);
 
         GIFReader reader = new GIFReader();
