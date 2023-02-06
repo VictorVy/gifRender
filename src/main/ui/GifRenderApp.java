@@ -1,6 +1,7 @@
 package ui;
 
 import com.icafe4j.image.ImageIO;
+import com.icafe4j.image.ImageType;
 import com.icafe4j.image.gif.GIFTweaker;
 import com.icafe4j.image.reader.GIFReader;
 import model.Roster;
@@ -28,6 +29,7 @@ public class GifRenderApp {
     private final String viewRosterComm = "vr";
     private final String addComm = "add ";
     private final String removeComm = "rm ";
+    private final String downloadComm = "down ";
     private final String outputComm = "out";
 
     public GifRenderApp() {
@@ -56,8 +58,10 @@ public class GifRenderApp {
             } catch (IOException e) {
                 System.out.println("Invalid input!");
                 throw new RuntimeException(e);
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Item doesn't exist!");
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Error.");
             }
         }
 
@@ -82,13 +86,9 @@ public class GifRenderApp {
         } else if (input.startsWith(addComm)) {
             addItem(input.substring(addComm.length()));
         } else if (input.startsWith(removeComm)) {
-            try {
-                removeItem(Integer.parseInt(input.substring(3)));
-            } catch (NumberFormatException e) {
-                System.out.println("Not an integer!");
-            } catch (IndexOutOfBoundsException e) {
-                System.out.println("Item doesn't exist!");
-            }
+            removeItem(Integer.parseInt(input.substring(removeComm.length())));
+        } else if (input.startsWith(downloadComm)) {
+            downloadItem(Integer.parseInt(input.substring(downloadComm.length())));
         } else if (input.equals(outputComm)) {
             outputRoster();
         } else {
@@ -103,8 +103,9 @@ public class GifRenderApp {
                 + exitComm + "\n\tExits the program.\n\n"
                 + viewRosterComm + "\n\tView items in the image roster.\n\n"
                 + addComm + "p\n\tAdd the image at path p to the roster."
-                          + "\n\t\tExample: add D:\\Pictures\\example.png\n\n"
+                + "\n\t\tExample: add D:\\Pictures\\example.png\n\n"
                 + removeComm + "i\n\tRemove the item at index i from the roster.\n\t\tExample: rm 0\n\n"
+                + downloadComm + "i\n\tDownload the item at index i as a png.\n\n"
                 + outputComm + "\n\tOutput the roster as a gif.");
     }
 
@@ -165,6 +166,30 @@ public class GifRenderApp {
         roster.remove(index);
     }
 
+    private void downloadItem(int index) throws Exception {
+        BufferedImage image = roster.getItem(index).getImage();
+
+        if (outputDir.toString().equals(noDir)) {
+            setOutputDir();
+        }
+        if (outputName.equals(noName)) {
+            setOutputName();
+        }
+        while (!confirm("Download " + outputName + ".png to " + outputDir + "?")) {
+            setOutputDir();
+            setOutputName();
+        }
+
+        writeImage(image);
+        System.out.println(outputName + ".png created in " + outputDir);
+    }
+
+    private void writeImage(BufferedImage image) throws Exception {
+        FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName + ".png");
+
+        ImageIO.write(image, out, ImageType.PNG);
+    }
+
     private void outputRoster() throws Exception {
         if (rosterIsEmpty()) {
             return;
@@ -181,11 +206,11 @@ public class GifRenderApp {
             setOutputName();
         }
 
-        makeGif();
+        writeGif();
         System.out.println(outputName + ".gif created in " + outputDir);
     }
 
-    private void makeGif() throws Exception {
+    private void writeGif() throws Exception {
         FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName + ".gif");
 
         GIFTweaker.writeAnimatedGIF(roster.getFrames(), out);

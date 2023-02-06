@@ -38,7 +38,7 @@ public class Roster {
     }
 
     public GIFFrame[] getFrames() {
-        Object[] arr = roster.stream().map(ri -> new GIFFrame(ri.getImage())).toArray();
+        Object[] arr = roster.stream().map(RosterItem::getFrame).toArray();
         //https://stackoverflow.com/questions/12210311/downcasting-of-arrays-in-java
         return Arrays.copyOf(arr, arr.length, GIFFrame[].class);
     }
