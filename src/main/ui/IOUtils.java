@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.nio.file.Path;
 import java.util.List;
 
 public class IOUtils {
@@ -28,19 +27,32 @@ public class IOUtils {
                 || n.contains("\"") || n.contains("<") || n.contains(">") || n.contains("|"));
     }
 
-    public static void writeImage(BufferedImage image, Path outputDir, String outputName) throws Exception {
-        FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName + ".png");
+    public static void writeImage(BufferedImage image, String outputDir, String outputName) throws Exception {
+        FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName);
+        String type = outputName.substring(outputName.lastIndexOf(".")).toLowerCase();
 
-        ImageIO.write(image, out, ImageType.PNG);
+        if (type.equals("jpg")) {
+            ImageIO.write(image, out, ImageType.JPG);
+        } else if (type.equals("bmp")) {
+            ImageIO.write(image, out, ImageType.BMP);
+        } else {
+            ImageIO.write(image, out, ImageType.PNG);
+        }
+
+        out.close();
     }
 
-    public static void writeGif(GIFFrame[] frames, Path outputDir, String outputName) throws Exception {
+    public static void writeGif(GIFFrame[] frames, String outputDir, String outputName) throws Exception {
         FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName + ".gif");
 
         GIFTweaker.writeAnimatedGIF(frames, out);
+
+        out.close();
     }
 
     public static List<GIFFrame> parseGif(File file) throws Exception {
+
+
         FileInputStream inputStream = new FileInputStream(file);
 
         GIFReader reader = new GIFReader();

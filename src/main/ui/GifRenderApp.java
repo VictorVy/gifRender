@@ -15,11 +15,6 @@ import java.util.List;
 public class GifRenderApp {
     private BufferedReader br;
     private Roster roster;
-    private Path outputDir;
-    private String outputName;
-
-    private final String noDir = "_nodir_";
-    private final String noName = "_noname_";
 
     private final String manComm = "man";
     private final String exitComm = "exit";
@@ -68,10 +63,7 @@ public class GifRenderApp {
 
     private void init() {
         br = new BufferedReader(new InputStreamReader(System.in));
-
         roster = new Roster();
-        outputDir = Path.of(noDir);
-        outputName = noName;
     }
 
     private void handleInput(String input) throws Exception {
@@ -84,9 +76,9 @@ public class GifRenderApp {
         } else if (input.startsWith(addComm)) {
             addItem(input.substring(addComm.length()));
         } else if (input.startsWith(removeComm)) {
-            removeItem(Integer.parseInt(input.substring(removeComm.length())));
+            handleRemove(input.substring(removeComm.length()));
         } else if (input.startsWith(downloadComm)) {
-            downloadItem(Integer.parseInt(input.substring(downloadComm.length())));
+            handleDownload(input.substring(downloadComm.length()));
         } else if (input.equals(outputComm)) {
             outputRoster();
         } else {
@@ -96,13 +88,14 @@ public class GifRenderApp {
 
     private void printManual() {
         System.out.println("Available commands:\n\n"
-                + manComm + "\n\tPrints this manual.\n\n"
-                + clearComm + "\n\tClears the screen.\n\n"
-                + exitComm + "\n\tExits the program.\n\n"
-                + viewRosterComm + "\n\tView items in the image roster.\n\n"
-                + addComm + "p\n\tAdd the image at path p to the roster."
-                + "\n\t\tExample: add D:\\Pictures\\example.png\n\n"
-                + removeComm + "i\n\tRemove the item at index i from the roster.\n\t\tExample: rm 0\n\n"
+                + manComm + "\n\tPrint this manual.\n\n"
+                + clearComm + "\n\tClear the console.\n\n"
+                + exitComm + "\n\tExit the program.\n\n"
+                + viewRosterComm + "\n\tView item in the image roster.\n\n"
+                + addComm + "p\n\tAdd the image or gif at path p to the roster."
+                + "\n\t\tadd D:\\Pictures\\example.png\n\n"
+                + removeComm + "i\n\tRemove the item at index i from the roster."
+                + "\n\t\trm 0\n\t\trm all\n\n"
                 + downloadComm + "i\n\tDownload the item at index i as a png.\n\n"
                 + outputComm + "\n\tOutput the roster as a gif.");
     }
@@ -120,7 +113,10 @@ public class GifRenderApp {
         System.out.println("Roster:");
         for (int i = 0; i < roster.size(); i++) {
             RosterItem ri = roster.getItem(i);
-            System.out.println("\nIndex " + i + "\n\t" + ri.getName());
+            System.out.println("\nIndex " + i
+                    + "\n\tName: " + ri.getName()
+                    + "\n\tDimensions: " + ri.getWidth() + "x" + ri.getHeight()
+                    + "\n\tDelay: " + ri.getDelay());
         }
     }
 
@@ -159,6 +155,14 @@ public class GifRenderApp {
         }
     }
 
+    private void handleRemove(String input) throws IOException {
+        if (input.equals("all")) {
+            removeAll();
+        } else {
+            removeItem(Integer.parseInt(input));
+        }
+    }
+
     private void removeItem(int index) throws IOException {
         if (confirm("Remove " + roster.getItem(index).getName() + " from the roster?")) {
             System.out.println(roster.getItem(index).getName() + " was removed from index " + index + ".");
@@ -166,14 +170,44 @@ public class GifRenderApp {
         }
     }
 
+    private void removeAll() throws IOException {
+        if (confirm("Remove all items from the roster?")) {
+            roster.clear();
+            System.out.println("All items were removed from the roster.");
+        }
+    }
+
+    private void handleDownload(String input) throws Exception {
+        if (input.equals("all")) {
+            downloadAll();
+        } else {
+            downloadItem(Integer.parseInt(input));
+        }
+    }
+
     private void downloadItem(int index) throws Exception {
+        String outputDir = askOutputDir();
+        String itemName = roster.getItem(index).getName();
+
         BufferedImage image = roster.getItem(index).getImage();
 
-        setOutputIfNone();
-        confirmOutput("Download " + outputName + ".png to " + outputDir + "?");
+        confirmOutput("Download " + itemName + " to " + outputDir + "?");
 
-        IOUtils.writeImage(image, outputDir, outputName);
-        System.out.println(outputName + ".png created in " + outputDir);
+        IOUtils.writeImage(image, outputDir, itemName);
+        System.out.println(itemName + " created in " + outputDir);
+    }
+
+    private void downloadAll() throws Exception {
+        String outputDir = askOutputDir();
+
+        confirmOutput("Download all roster items to " + outputDir + "?");
+
+        for (int i = 0; i < roster.size(); i++) {
+            RosterItem ri = roster.getItem(i);
+            IOUtils.writeImage(ri.getImage(), outputDir, ri.getName());
+        }
+
+        System.out.println("Downloaded roster items to " + outputDir);
     }
 
     private void outputRoster() throws Exception {
@@ -181,52 +215,42 @@ public class GifRenderApp {
             return;
         }
 
-        setOutputIfNone();
+        String outputDir = askOutputDir();
+        String outputName = askOutputName();
+
         confirmOutput("Output " + outputName + ".gif to " + outputDir + "?");
 
         IOUtils.writeGif(roster.getFrames(), outputDir, outputName);
         System.out.println(outputName + ".gif created in " + outputDir);
     }
 
-    private void setOutputIfNone() throws IOException {
-        if (outputDir.toString().equals(noDir)) {
-            setOutputDir();
-        }
-        if (outputName.equals(noName)) {
-            setOutputName();
-        }
-    }
-
-
     private void confirmOutput(String msg) throws IOException {
         while (!confirm(msg)) {
-            setOutputDir();
-            setOutputName();
+            askOutputDir();
+            askOutputName();
         }
     }
 
-    private void setOutputDir() throws IOException {
+    private String askOutputDir() throws IOException {
         while (true) {
             System.out.println("Please specify output directory:");
             Path input = Path.of(br.readLine());
 
             if (input.toFile().exists() && input.toFile().isDirectory()) {
-                outputDir = input;
-                break;
+                return input.toString();
             } else {
                 System.out.println("Invalid output path!");
             }
         }
     }
 
-    private void setOutputName() throws IOException {
+    private String askOutputName() throws IOException {
         while (true) {
             System.out.println("Please specify output file name:");
             String input = br.readLine();
 
             if (IOUtils.isLegalName(input)) {
-                outputName = input;
-                break;
+                return input;
             } else {
                 System.out.println("Invalid name!");
             }

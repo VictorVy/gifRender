@@ -21,6 +21,10 @@ public class Roster {
         roster.remove(index);
     }
 
+    public void clear() {
+        roster.clear();
+    }
+
     public boolean isEmpty() {
         return roster.isEmpty();
     }
