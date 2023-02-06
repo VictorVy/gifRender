@@ -1,7 +1,6 @@
 IN PROGRESS:
-- preserve gif frame parameters while rending
 
 NEXT:
-- download roster items
 - manipulate frame parameters
 - selection handling
+- investigate rent frame parameter preservation
