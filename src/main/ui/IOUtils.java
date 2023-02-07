@@ -12,21 +12,26 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.List;
 
+// utility class for file input/output
 public class IOUtils {
+    // EFFECTS: inaccessible constructor
     private IOUtils() {
 
     }
 
+    // EFFECTS: returns true if name indicates an image or gif file
     public static boolean isImageOrGif(String name) {
         String n = name.toLowerCase();
-        return n.endsWith("png") || n.endsWith("jpg") || n.endsWith("bmp") || n.endsWith("gif");
+        return n.endsWith(".png") || n.endsWith(".jpg") || n.endsWith(".bmp") || n.endsWith(".gif");
     }
 
+    // EFFECTS: returns true if n is allowed as a file name
     public static boolean isLegalName(String n) {
         return !(n.contains("\\") || n.contains("/") || n.contains(":") || n.contains("*") || n.contains("?")
                 || n.contains("\"") || n.contains("<") || n.contains(">") || n.contains("|"));
     }
 
+    // EFFECTS: writes image to outputDir, named outputName
     public static void writeImage(BufferedImage image, String outputDir, String outputName) throws Exception {
         FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName);
         String type = outputName.substring(outputName.lastIndexOf(".")).toLowerCase();
@@ -42,6 +47,7 @@ public class IOUtils {
         out.close();
     }
 
+    // EFFECTS: writes frames as a gif to outputDir, named outputName
     public static void writeGif(GIFFrame[] frames, String outputDir, String outputName) throws Exception {
         FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName + ".gif");
 
@@ -50,11 +56,14 @@ public class IOUtils {
         out.close();
     }
 
+    // EFFECTS: parses gif file and returns list of the frames
     public static List<GIFFrame> parseGif(File file) throws Exception {
         FileInputStream inputStream = new FileInputStream(file);
 
         GIFReader reader = new GIFReader();
         reader.read(inputStream);
+        inputStream.close();
+
         return reader.getGIFFrames();
     }
 }

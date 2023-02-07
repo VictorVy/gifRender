@@ -26,10 +26,13 @@ public class GifRenderApp {
     private final String delayComm = "d ";
     private final String outputComm = "out";
 
+    // EFFECTS: runs gifRender
     public GifRenderApp() {
         run();
     }
 
+    // MODIFIES: this
+    // EFFECTS: main user interface loop
     public void run() {
         init();
 
@@ -62,11 +65,15 @@ public class GifRenderApp {
         System.out.println("Adios!");
     }
 
+    // MODIFIES: this
+    // EFFECTS: initializes buffered reader and roster
     private void init() {
         br = new BufferedReader(new InputStreamReader(System.in));
         roster = new Roster();
     }
 
+    // MODIFIES: this
+    // EFFECTS: delegates tasks to appropriate method based on input
     private void handleInput(String input) throws Exception {
         if (input.equals(manComm)) {
             printManual();
@@ -89,6 +96,7 @@ public class GifRenderApp {
         }
     }
 
+    // EFFECTS: prints the list of commands to the console
     private void printManual() {
         System.out.println("Available commands:\n\n"
                 + manComm + "\n\tPrint this manual.\n\n"
@@ -106,11 +114,13 @@ public class GifRenderApp {
                 + outputComm + "\n\tOutput the roster as a gif.");
     }
 
+    // EFFECTS: "clears" the console
     private void clearScreen() {
         // https://stackoverflow.com/questions/2979383/how-to-clear-the-console
         System.out.println(System.lineSeparator().repeat(50));
     }
 
+    // EFFECTS: displays all roster items and details
     private void viewRoster() {
         if (rosterIsEmpty()) {
             return;
@@ -126,6 +136,9 @@ public class GifRenderApp {
         }
     }
 
+    // REQUIRES: inputPath is a valid path to an image or gif file
+    // MODIFIES: this
+    // EFFECTS: adds the file at inputPath to the roster
     private void addItem(String inputPath) {
         Path path = Path.of(inputPath);
         File file = path.toFile();
@@ -133,7 +146,7 @@ public class GifRenderApp {
         try {
             if (!file.exists() || !IOUtils.isImageOrGif(file.getName())) {
                 throw new InvalidPathException(inputPath, "Invalid input path.");
-            } else if (file.getName().toLowerCase().endsWith("gif")) {
+            } else if (file.getName().toLowerCase().endsWith(".gif")) {
                 addGif(file);
             } else {
                 addImage(file);
@@ -148,10 +161,16 @@ public class GifRenderApp {
         }
     }
 
+    // REQUIRES: file is an image file of type png, jpg, or bmp
+    // MODIFIES: this
+    // EFFECTS: adds the image file to the roster as a RosterItem
     private void addImage(File file) throws Exception {
         roster.add(new RosterItem(ImageIO.read(file), file.getName()));
     }
 
+    // REQUIRES: file is a gif file
+    // MODIFIES: this
+    // EFFECTS: adds the frames of the gif file to the roster as RosterItems
     private void addGif(File file) throws Exception {
         String name = file.getName().substring(0, file.getName().lastIndexOf("."));
         List<GIFFrame> frames = IOUtils.parseGif(file);
@@ -161,6 +180,8 @@ public class GifRenderApp {
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: delegates the remove command to appropriate method
     private void handleRemove(String input) throws IOException {
         if (input.equals("all")) {
             removeAll();
@@ -169,13 +190,17 @@ public class GifRenderApp {
         }
     }
 
-    private void removeItem(int index) throws IOException {
-        if (confirm("Remove " + roster.getItem(index).getName() + " from the roster?")) {
-            System.out.println(roster.getItem(index).getName() + " was removed from index " + index + ".");
-            roster.remove(index);
+    // MODIFIES: this
+    // EFFECTS: removes the item at index i from the roster
+    private void removeItem(int i) throws IOException {
+        if (confirm("Remove " + roster.getItem(i).getName() + " from the roster?")) {
+            System.out.println(roster.getItem(i).getName() + " was removed from index " + i + ".");
+            roster.remove(i);
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: removes all items from the roster
     private void removeAll() throws IOException {
         if (rosterIsEmpty()) {
             return;
@@ -187,6 +212,7 @@ public class GifRenderApp {
         }
     }
 
+    // EFFECTS: delegates the download command to appropriate method
     private void handleDownload(String input) throws Exception {
         if (input.equals("all")) {
             downloadAll();
@@ -195,19 +221,21 @@ public class GifRenderApp {
         }
     }
 
-    private void downloadItem(int index) throws Exception {
-        String itemName = roster.getItem(index).getName();
+    // EFFECTS: downloads the roster item at index i to a specified path
+    private void downloadItem(int i) throws Exception {
+        String itemName = roster.getItem(i).getName();
         String outputDir = askOutputDir();
 
 
         if (confirm("Download " + itemName + " to " + outputDir + "?")) {
-            BufferedImage image = roster.getItem(index).getImage();
+            BufferedImage image = roster.getItem(i).getImage();
 
             IOUtils.writeImage(image, outputDir, itemName);
             System.out.println(itemName + " created in " + outputDir);
         }
     }
 
+    // EFFECTS: downloads all roster items to a specified path
     private void downloadAll() throws Exception {
         if (rosterIsEmpty()) {
             return;
@@ -225,6 +253,8 @@ public class GifRenderApp {
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: delegates the delay command to appropriate method
     private void handleDelay(String input) throws IOException {
         if (input.equals("all")) {
             setAllDelays();
@@ -233,14 +263,18 @@ public class GifRenderApp {
         }
     }
 
-    private void setDelay(int index) throws IOException {
-        RosterItem ri = roster.getItem(index);
+    // MODIFIES: this
+    // EFFECTS: sets the delay for the roster item at index i
+    private void setDelay(int i) throws IOException {
+        RosterItem ri = roster.getItem(i);
         int delay = askDelay();
 
         ri.setDelay(delay);
         System.out.println("Delay set to " + delay + " ms for " + ri);
     }
 
+    // MODIFIES: this
+    // EFFECTS: sets the delay for all roster items
     private void setAllDelays() throws IOException {
         if (rosterIsEmpty()) {
             return;
@@ -255,6 +289,7 @@ public class GifRenderApp {
         System.out.println("Delay set to " + delay + " ms for all roster items.");
     }
 
+    // EFFECTS: outputs the roster to a specified path as a gif
     private void outputRoster() throws Exception {
         if (rosterIsEmpty()) {
             return;
@@ -269,6 +304,7 @@ public class GifRenderApp {
         }
     }
 
+    // EFFECTS: prompts user to specify an output path, and returns it
     private String askOutputDir() throws IOException {
         while (true) {
             System.out.println("Please specify output directory:");
@@ -282,6 +318,7 @@ public class GifRenderApp {
         }
     }
 
+    // EFFECTS: prompts user to specify an output file name, and returns it
     private String askOutputName() throws IOException {
         while (true) {
             System.out.println("Please specify output file name:");
@@ -295,6 +332,7 @@ public class GifRenderApp {
         }
     }
 
+    // EFFECTS: prompts user to specify a delay value (in milliseconds) and returns it
     private int askDelay() throws IOException {
         while (true) {
             System.out.println("Please specify delay (ms):");
@@ -312,6 +350,7 @@ public class GifRenderApp {
         }
     }
 
+    // EFFECTS: prompts user to enter Y or N in response to the message, returning true if Y and false if N
     private boolean confirm(String message) throws IOException {
         System.out.println(message);
 
@@ -327,6 +366,7 @@ public class GifRenderApp {
         }
     }
 
+    // EFFECTS: if the roster is empty, notify the user and return true; otherwise return false
     private boolean rosterIsEmpty() {
         if (roster.isEmpty()) {
             System.out.println("Your roster is empty!");

@@ -1,5 +1,13 @@
 IN PROGRESS:
 
 NEXT:
-- frame renaming
+- testing
+- handle RosterItem name collisions
+- renaming
 - selection handling
+
+TO ASK:
+- IOUtils package
+- REQUIRES for input strings / index parameters
+- MODIFIES contradiction (Roster (field)? chain? br?)
+- comments?
