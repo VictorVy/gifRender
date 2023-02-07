@@ -94,13 +94,14 @@ public class GifRenderApp {
                 + manComm + "\n\tPrint this manual.\n\n"
                 + clearComm + "\n\tClear the console.\n\n"
                 + exitComm + "\n\tExit the program.\n\n"
-                + viewRosterComm + "\n\tView item in the image roster.\n\n"
+                + viewRosterComm + "\n\tView all items in the image roster.\n\n"
                 + addComm + "p\n\tAdd the image or gif at path p to the roster."
                 + "\n\t\tadd D:\\Pictures\\example.png\n\n"
                 + removeComm + "i\n\tRemove the item at index i from the roster."
                 + "\n\t\trm 0\n\t\trm all\n\n"
-                + downloadComm + "i\n\tDownload the item at index i as a png.\n\n"
-                + delayComm + "i\n\tSet the delay of the roster item at index i."
+                + downloadComm + "i\n\tDownload the item at index i."
+                + "\n\t\tdown 0\n\t\tdown all\n\n"
+                + delayComm + "i\n\tSet the delay of the item at index i. Rounded to the nearest 10 ms."
                 + "\n\t\td 0\n\t\td all\n\n"
                 + outputComm + "\n\tOutput the roster as a gif.");
     }
@@ -131,7 +132,7 @@ public class GifRenderApp {
 
         try {
             if (!file.exists() || !IOUtils.isImageOrGif(file.getName())) {
-                throw new InvalidPathException(inputPath, "Invalid input path!");
+                throw new InvalidPathException(inputPath, "Invalid input path.");
             } else if (file.getName().toLowerCase().endsWith("gif")) {
                 addGif(file);
             } else {
@@ -176,6 +177,10 @@ public class GifRenderApp {
     }
 
     private void removeAll() throws IOException {
+        if (rosterIsEmpty()) {
+            return;
+        }
+
         if (confirm("Remove all items from the roster?")) {
             roster.clear();
             System.out.println("All items were removed from the roster.");
@@ -204,6 +209,10 @@ public class GifRenderApp {
     }
 
     private void downloadAll() throws Exception {
+        if (rosterIsEmpty()) {
+            return;
+        }
+
         String outputDir = askOutputDir();
 
         if (confirm("Download all roster items to " + outputDir + "?")) {
@@ -233,6 +242,10 @@ public class GifRenderApp {
     }
 
     private void setAllDelays() throws IOException {
+        if (rosterIsEmpty()) {
+            return;
+        }
+
         int delay = askDelay();
 
         for (RosterItem ri : roster.getItems()) {

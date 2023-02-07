@@ -1,5 +1,4 @@
 IN PROGRESS:
-- figure out delay shenanigans
 
 NEXT:
 - frame renaming
