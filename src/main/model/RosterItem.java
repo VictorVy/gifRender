@@ -59,13 +59,7 @@ public class RosterItem {
     // EFFECTS: sets the delay to the new delay, changes the GIFFrame to have the new delay
     public void setDelay(int delay) {
         this.delay = delay;
-        frame = copyExceptDelay(delay);
-    }
-
-    // EFFECTS: returns a new GIFFrame with all the same properties as frame except for the delay
-    private GIFFrame copyExceptDelay(int delay) {
-        return new GIFFrame(image, frame.getLeftPosition(), frame.getTopPosition(), delay, frame.getDisposalMethod(),
-                frame.getUserInputFlag(), frame.getTransparencyFlag(), frame.getTransparentColor());
+        frame = ModelUtils.copyExceptDelay(frame, delay);
     }
 
     // EFFECTS: returns the name

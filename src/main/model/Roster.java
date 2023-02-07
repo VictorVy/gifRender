@@ -3,7 +3,6 @@ package model;
 import com.icafe4j.image.gif.GIFFrame;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 // Represents the collection of frames comprising the output gif
 public class Roster {
@@ -53,8 +52,6 @@ public class Roster {
 
     // EFFECTS: returns the roster as an array of GIFFrames
     public GIFFrame[] getFrames() {
-        Object[] arr = roster.stream().map(RosterItem::getFrame).toArray();
-        //https://stackoverflow.com/questions/12210311/downcasting-of-arrays-in-java
-        return Arrays.copyOf(arr, arr.length, GIFFrame[].class);
+        return ModelUtils.toGifFrames(roster);
     }
 }
