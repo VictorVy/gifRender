@@ -18,6 +18,7 @@ public class Roster {
         roster.add(ri);
     }
 
+    // REQUIRES: 0 <= i < size();
     // MODIFIES: this
     // EFFECTS: removes the RosterItem at index i from the roster
     public void remove(int i) {
@@ -40,6 +41,7 @@ public class Roster {
         return roster.size();
     }
 
+    // REQUIRES: 0 <= i < size();
     // EFFECTS: returns the RosterItem at index i
     public RosterItem getItem(int i) {
         return roster.get(i);

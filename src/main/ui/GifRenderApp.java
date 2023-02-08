@@ -270,7 +270,7 @@ public class GifRenderApp {
         int delay = askDelay();
 
         ri.setDelay(delay);
-        System.out.println("Delay set to " + delay + " ms for " + ri);
+        System.out.println("Delay set to " + delay + " ms for " + ri.getName());
     }
 
     // MODIFIES: this
@@ -337,13 +337,7 @@ public class GifRenderApp {
         while (true) {
             System.out.println("Please specify delay (ms):");
             try {
-                int delay = Integer.parseInt(br.readLine());
-
-                if (delay >= 0) {
-                    return delay;
-                }
-
-                throw new NumberFormatException();
+                return Integer.parseInt(br.readLine());
             } catch (NumberFormatException e) {
                 System.out.println("Must be a non-negative integer!");
             }

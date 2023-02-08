@@ -55,16 +55,16 @@ public class RosterItem {
         return delay;
     }
 
+    // REQUIRES: delay >= 0
     // MODIFIES: this
-    // EFFECTS: sets the delay to the new delay, changes the GIFFrame to have the new delay
+    // EFFECTS: sets the delay to the new delay rounded to the nearest 10 ms, and changes frame to reflect the new delay
     public void setDelay(int delay) {
-        this.delay = delay;
-        frame = ModelUtils.copyExceptDelay(frame, delay);
-    }
+        if (delay < 0) {
+            throw new NumberFormatException();
+        }
 
-    // EFFECTS: returns the name
-    @Override
-    public String toString() {
-        return getName();
+        int d = (int) Math.round(delay / 10.0) * 10;
+        this.delay = d;
+        frame = ModelUtils.copyExceptDelay(frame, d);
     }
 }

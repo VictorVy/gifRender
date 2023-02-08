@@ -1,13 +1,12 @@
 IN PROGRESS:
 
 NEXT:
-- testing
 - handle RosterItem name collisions
 - renaming
-- selection handling
+- selection handling (not for cli)
 
 TO ASK:
 - IOUtils package
+- initialization in constructor vs at declaration (runBefore and normal)
 - REQUIRES for input strings / index parameters
-- MODIFIES contradiction (Roster (field)? chain? br?)
 - comments?
