@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 // gifRender application
@@ -116,8 +117,7 @@ public class GifRenderApp {
 
     // EFFECTS: "clears" the console
     private void clearScreen() {
-        // https://stackoverflow.com/questions/2979383/how-to-clear-the-console
-        System.out.println(System.lineSeparator().repeat(50));
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
 
     // EFFECTS: displays all roster items and details
@@ -140,7 +140,7 @@ public class GifRenderApp {
     // MODIFIES: this
     // EFFECTS: adds the file at inputPath to the roster
     private void addItem(String inputPath) {
-        Path path = Path.of(inputPath);
+        Path path = Paths.get(inputPath);
         File file = path.toFile();
 
         try {
@@ -308,7 +308,7 @@ public class GifRenderApp {
     private String askOutputDir() throws IOException {
         while (true) {
             System.out.println("Please specify output directory:");
-            Path input = Path.of(br.readLine());
+            Path input = Paths.get(br.readLine());
 
             if (input.toFile().exists() && input.toFile().isDirectory()) {
                 return input.toString();
