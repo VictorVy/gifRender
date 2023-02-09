@@ -13,6 +13,7 @@ class RosterTest {
     Roster roster;
     RosterItem ri1 = new RosterItem(new BufferedImage(100, 100, 1), "test1.png");
     RosterItem ri2 = new RosterItem(new BufferedImage(1920, 1080, 1), "test2.jpg");
+    RosterItem ri3 = new RosterItem(new BufferedImage(16, 9, 1), "test3.bmp");
 
     @BeforeEach
     public void runBefore() {
@@ -51,6 +52,16 @@ class RosterTest {
 
         assertTrue(roster.isEmpty());
         assertEquals(0, roster.size());
+    }
+    @Test
+    public void removeTestOutOfBounds() {
+        roster.add(ri1);
+
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.remove(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.remove(1));
+
+        assertEquals(ri1, roster.getItem(0));
+        assertEquals(1, roster.size());
     }
     @Test
     public void removeTestMultipleTimes() {
@@ -111,6 +122,15 @@ class RosterTest {
     }
 
     @Test
+    public void getItemsTestOutOfBounds() {
+        roster.add(ri2);
+        roster.add(ri1);
+
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.getItem(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.getItem(2));
+    }
+
+    @Test
     public void getItemsTest() {
         roster.add(ri2);
         roster.add(ri1);
@@ -128,5 +148,80 @@ class RosterTest {
 
         assertEquals(ri2.getFrame(), frames[0]);
         assertEquals(ri1.getFrame(), frames[1]);
+    }
+
+    @Test
+    public void swapTest() {
+        roster.add(ri1);
+        roster.add(ri2);
+        roster.add(ri3);
+
+        roster.swap(0, 1);
+
+        assertEquals(ri2, roster.getItem(0));
+        assertEquals(ri1, roster.getItem(1));
+        assertEquals(ri3, roster.getItem(2));
+
+        roster.swap(2, 0);
+
+        assertEquals(ri3, roster.getItem(0));
+        assertEquals(ri1, roster.getItem(1));
+        assertEquals(ri2, roster.getItem(2));
+    }
+
+    @Test
+    public void swapTestOutOfBounds() {
+        roster.add(ri1);
+        roster.add(ri2);
+        roster.add(ri3);
+
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.swap(-1, 2));
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.swap(1, 3));
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.swap(42, -19));
+
+        assertEquals(ri1, roster.getItem(0));
+        assertEquals(ri2, roster.getItem(1));
+        assertEquals(ri3, roster.getItem(2));
+    }
+
+    @Test
+    public void shiftTest() {
+        roster.add(ri1);
+        roster.add(ri2);
+        roster.add(ri3);
+
+        roster.shift(0, 1);
+
+        assertEquals(ri2, roster.getItem(0));
+        assertEquals(ri1, roster.getItem(1));
+        assertEquals(ri3, roster.getItem(2));
+
+        roster.shift(2, 0);
+
+        assertEquals(ri3, roster.getItem(0));
+        assertEquals(ri2, roster.getItem(1));
+        assertEquals(ri1, roster.getItem(2));
+
+        roster.shift(0, 2);
+
+        assertEquals(ri2, roster.getItem(0));
+        assertEquals(ri1, roster.getItem(1));
+        assertEquals(ri3, roster.getItem(2));
+    }
+
+    @Test
+    public void shiftTestOutOfBounds() {
+        roster.add(ri1);
+        roster.add(ri2);
+        roster.add(ri3);
+
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.shift(-1, 2));
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.shift(1, 3));
+        assertThrows(IndexOutOfBoundsException.class, () -> roster.shift(42, -19));
+
+
+        assertEquals(ri1, roster.getItem(0));
+        assertEquals(ri2, roster.getItem(1));
+        assertEquals(ri3, roster.getItem(2));
     }
 }

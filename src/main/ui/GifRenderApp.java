@@ -23,6 +23,8 @@ public class GifRenderApp {
     private final String viewRosterComm = "vr";
     private final String addComm = "add ";
     private final String removeComm = "rm ";
+    private final String swapComm = "sw ";
+    private final String shiftComm = "sh ";
     private final String downloadComm = "down ";
     private final String delayComm = "d ";
     private final String outputComm = "out";
@@ -86,6 +88,10 @@ public class GifRenderApp {
             addItem(input.substring(addComm.length()));
         } else if (input.startsWith(removeComm)) {
             handleRemove(input.substring(removeComm.length()));
+        } else if (input.startsWith(swapComm)) {
+            swapItems(input.substring(swapComm.length()));
+        } else if (input.startsWith(shiftComm)) {
+            shiftItems(input.substring(shiftComm.length()));
         } else if (input.startsWith(downloadComm)) {
             handleDownload(input.substring(downloadComm.length()));
         } else if (input.startsWith(delayComm)) {
@@ -100,19 +106,23 @@ public class GifRenderApp {
     // EFFECTS: prints the list of commands to the console
     private void printManual() {
         System.out.println("Available commands:\n\n"
-                + manComm + "\n\tPrint this manual.\n\n"
-                + clearComm + "\n\tClear the console.\n\n"
-                + exitComm + "\n\tExit the program.\n\n"
-                + viewRosterComm + "\n\tView all items in the image roster.\n\n"
-                + addComm + "p\n\tAdd the image or gif at path p to the roster."
+                + "> " + manComm + "\n\tPrint this manual.\n\n"
+                + "> " + clearComm + "\n\tClear the console.\n\n"
+                + "> " + exitComm + "\n\tExit the program.\n\n"
+                + "> " + viewRosterComm + "\n\tView all items in the image roster.\n\n"
+                + "> " + addComm + "p\n\tAdd the image or gif at path p to the roster."
                 + "\n\t\tadd D:\\Pictures\\example.png\n\n"
-                + removeComm + "i\n\tRemove the item at index i from the roster."
+                + "> " + removeComm + "i\n\tRemove the item at index i from the roster."
                 + "\n\t\trm 0\n\t\trm all\n\n"
-                + downloadComm + "i\n\tDownload the item at index i."
+                + "> " + swapComm + "a b\n\tSwap the positions of the items at index a and index b."
+                + "\n\t\tsw 42 19\n\n"
+                + "> " + shiftComm + "a b\n\tShift the position of the item at index a to index b."
+                + "\n\t\tsh 42 19\n\n"
+                + "> " + downloadComm + "i\n\tDownload the item at index i."
                 + "\n\t\tdown 0\n\t\tdown all\n\n"
-                + delayComm + "i\n\tSet the delay of the item at index i. Rounded to the nearest 10 ms."
+                + "> " + delayComm + "i\n\tSet the delay of the item at index i. Rounded to the nearest 10 ms."
                 + "\n\t\td 0\n\t\td all\n\n"
-                + outputComm + "\n\tOutput the roster as a gif.");
+                + "> " + outputComm + "\n\tOutput the roster as a gif.");
     }
 
     // EFFECTS: "clears" the console
@@ -210,6 +220,32 @@ public class GifRenderApp {
             roster.clear();
             System.out.println("All items were removed from the roster.");
         }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: swaps the item at index a with the item at index b
+    private void swapItems(String input) {
+        String[] split = input.split(" ");
+
+        int a = Integer.parseInt(split[0]);
+        int b = Integer.parseInt(split[1]);
+
+        roster.swap(a, b);
+
+        System.out.println("Swapped " + roster.getItem(a).getName() + " and " + roster.getItem(b).getName());
+    }
+
+    // MODIFIES: this
+    // EFFECTS: shifts the item at index a to index b
+    private void shiftItems(String input) {
+        String[] split = input.split(" ");
+
+        int a = Integer.parseInt(split[0]);
+        int b = Integer.parseInt(split[1]);
+
+        roster.shift(a, b);
+
+        System.out.println("Shifted " + roster.getItem(a).getName() + " to index " + b + ".");
     }
 
     // EFFECTS: delegates the download command to appropriate method
