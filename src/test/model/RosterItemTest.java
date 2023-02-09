@@ -42,6 +42,15 @@ class RosterItemTest {
     }
 
     @Test
+    public void setNameTest() {
+        ri1.setName(".png");
+        ri2.setName(" . .jpg");
+
+        assertEquals(".png", ri1.getName());
+        assertEquals(" . .jpg", ri2.getName());
+    }
+
+    @Test
     public void setDelayTest() {
         int d1 = 100;
         int d2 = 2550;

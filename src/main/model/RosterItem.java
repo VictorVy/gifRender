@@ -43,6 +43,10 @@ public class RosterItem {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public int getWidth() {
         return width;
     }

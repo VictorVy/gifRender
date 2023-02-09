@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 
 // gifRender application
@@ -25,6 +26,7 @@ public class GifRenderApp {
     private final String removeComm = "rm ";
     private final String swapComm = "sw ";
     private final String shiftComm = "sh ";
+    private final String renameComm = "ren ";
     private final String downloadComm = "down ";
     private final String delayComm = "d ";
     private final String outputComm = "out";
@@ -77,6 +79,7 @@ public class GifRenderApp {
 
     // MODIFIES: this
     // EFFECTS: delegates tasks to appropriate method based on input
+    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private void handleInput(String input) throws Exception {
         if (input.equals(manComm)) {
             printManual();
@@ -92,6 +95,8 @@ public class GifRenderApp {
             swapItems(input.substring(swapComm.length()));
         } else if (input.startsWith(shiftComm)) {
             shiftItems(input.substring(shiftComm.length()));
+        } else if (input.startsWith(renameComm)) {
+            renameItem(Integer.parseInt(input.substring(renameComm.length())));
         } else if (input.startsWith(downloadComm)) {
             handleDownload(input.substring(downloadComm.length()));
         } else if (input.startsWith(delayComm)) {
@@ -110,18 +115,20 @@ public class GifRenderApp {
                 + "> " + clearComm + "\n\tClear the console.\n\n"
                 + "> " + exitComm + "\n\tExit the program.\n\n"
                 + "> " + viewRosterComm + "\n\tView all items in the image roster.\n\n"
-                + "> " + addComm + "p\n\tAdd the image or gif at path p to the roster."
-                + "\n\t\tadd D:\\Pictures\\example.png\n\n"
-                + "> " + removeComm + "i\n\tRemove the item at index i from the roster."
-                + "\n\t\trm 0\n\t\trm all\n\n"
-                + "> " + swapComm + "a b\n\tSwap the positions of the items at index a and index b."
-                + "\n\t\tsw 42 19\n\n"
-                + "> " + shiftComm + "a b\n\tShift the position of the item at index a to index b."
-                + "\n\t\tsh 42 19\n\n"
-                + "> " + downloadComm + "i\n\tDownload the item at index i."
-                + "\n\t\tdown 0\n\t\tdown all\n\n"
-                + "> " + delayComm + "i\n\tSet the delay of the item at index i. Rounded to the nearest 10 ms."
-                + "\n\t\td 0\n\t\td all\n\n"
+                + "> " + addComm + "p\n\tAdd the image or gif at path p to the roster.\n\t\t"
+                + addComm + "D:\\Pictures\\example.png\n\n"
+                + "> " + removeComm + "i\n\tRemove the item at index i from the roster.\n\t\t"
+                + removeComm + "0\n\t\t" + removeComm + "all\n\n"
+                + "> " + swapComm + "a b\n\tSwap the positions of the items at index a and index b.\n\t\t"
+                + swapComm + "42 19\n\n"
+                + "> " + shiftComm + "a b\n\tShift the position of the item at index a to index b.\n\t\t"
+                + shiftComm + "42 19\n\n"
+                + "> " + renameComm + "i\n\tRename the item at index i.\n\t\t"
+                + renameComm + "0\n\n"
+                + "> " + downloadComm + "i\n\tDownload the item at index i.\n\t\t"
+                + downloadComm + "0\n\t\t" + downloadComm + "all\n\n"
+                + "> " + delayComm + "i\n\tSet the delay of the item at index i. Rounded to the nearest 10 ms.\n\t\t"
+                + delayComm + "0\n\t\t" + delayComm + "all\n\n"
                 + "> " + outputComm + "\n\tOutput the roster as a gif.");
     }
 
@@ -261,6 +268,28 @@ public class GifRenderApp {
         System.out.println("Shifted " + roster.getItem(a).getName() + " to index " + b + ".");
     }
 
+    // MODIFIES: this
+    // EFFECTS: renames the roster item at index i, if no name collisions
+    private void renameItem(int i) throws IOException {
+        RosterItem ri = roster.getItem(i);
+        String oldName = ri.getName();
+
+        String newName = askName("Enter new name for " + oldName + ":")
+                + oldName.substring(oldName.lastIndexOf("."));
+
+        HashSet<String> names = new HashSet<>(roster.getNames());
+        names.remove(oldName);
+
+        if (!names.contains(newName.toLowerCase())) {
+            ri.setName(newName);
+            roster.rename(oldName, newName);
+
+            System.out.println(oldName + " has been renamed to " + newName);
+        } else {
+            System.out.println("An item named " + newName + " already exists!");
+        }
+    }
+
     // EFFECTS: delegates the download command to appropriate method
     private void handleDownload(String input) throws Exception {
         if (input.equals("all")) {
@@ -345,7 +374,7 @@ public class GifRenderApp {
         }
 
         String outputDir = askOutputDir();
-        String outputName = askOutputName();
+        String outputName = askName("Please specify output file name:");
 
         if (confirm("Output " + outputName + ".gif to " + outputDir + "?")) {
             IOUtils.writeGif(roster.getFrames(), outputDir, outputName);
@@ -368,9 +397,9 @@ public class GifRenderApp {
     }
 
     // EFFECTS: prompts user to specify an output file name, and returns it
-    private String askOutputName() throws IOException {
+    private String askName(String msg) throws IOException {
         while (true) {
-            System.out.println("Please specify output file name:");
+            System.out.println(msg);
             String input = br.readLine();
 
             if (IOUtils.isLegalName(input)) {

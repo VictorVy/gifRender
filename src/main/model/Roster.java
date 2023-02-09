@@ -19,14 +19,14 @@ public class Roster {
     // EFFECTS: adds ri to the roster and its name to the name set
     public void add(RosterItem ri) {
         items.add(ri);
-        names.add(ri.getName());
+        names.add(ri.getName().toLowerCase());
     }
 
     // REQUIRES: 0 <= i < size();
     // MODIFIES: this
     // EFFECTS: removes the RosterItem at index i from the roster and its name from the name set
     public void remove(int i) {
-        names.remove(items.get(i).getName());
+        names.remove(items.get(i).getName().toLowerCase());
         items.remove(i);
     }
 
@@ -105,6 +105,14 @@ public class Roster {
 
     // EFFECTS: returns true if a RosterItem already has name n
     public boolean containsName(String n) {
-        return names.contains(n);
+        return names.contains(n.toLowerCase());
+    }
+
+    // REQUIRES: name is already in the name set
+    // MODIFIES: this
+    // EFFECTS: replaces name in name set with newName
+    public void rename(String name, String newName) {
+        names.remove(name.toLowerCase());
+        names.add(newName.toLowerCase());
     }
 }

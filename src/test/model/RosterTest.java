@@ -13,7 +13,7 @@ class RosterTest {
     Roster roster;
     RosterItem ri1 = new RosterItem(new BufferedImage(100, 100, 1), "test1.png");
     RosterItem ri2 = new RosterItem(new BufferedImage(1920, 1080, 1), "test2.jpg");
-    RosterItem ri3 = new RosterItem(new BufferedImage(16, 9, 1), "test3.bmp");
+    RosterItem ri3 = new RosterItem(new BufferedImage(16, 9, 1), "Test3.BMP");
 
     @BeforeEach
     public void runBefore() {
@@ -255,17 +255,40 @@ class RosterTest {
     }
 
     @Test
-    public void containsTest() {
+    public void containsNameTest() {
         roster.add(ri1);
         roster.add(ri2);
         roster.add(ri3);
 
         assertTrue(roster.containsName(ri1.getName()));
-        assertTrue(roster.containsName(ri2.getName()));
-        assertTrue(roster.containsName(ri3.getName()));
+        assertTrue(roster.containsName(ri2.getName().toLowerCase()));
+        assertTrue(roster.containsName(ri3.getName().toUpperCase()));
 
         assertFalse(roster.containsName(" " + ri1.getName()));
         assertFalse(roster.containsName("._." + ri2.getName()));
         assertFalse(roster.containsName("T.T" + ri3.getName()));
+    }
+
+    @Test
+    public void renameTest() {
+        roster.add(ri1);
+        roster.add(ri2);
+        roster.add(ri3);
+
+        String name = "new.png";
+
+        roster.rename(ri1.getName(), name);
+
+        assertFalse(roster.containsName(ri1.getName()));
+        assertTrue(roster.containsName(ri2.getName()));
+        assertTrue(roster.containsName(ri3.getName()));
+        assertTrue(roster.containsName(name));
+
+        roster.rename(ri2.getName(), ri1.getName());
+
+        assertTrue(roster.containsName(ri1.getName()));
+        assertFalse(roster.containsName(ri2.getName()));
+        assertTrue(roster.containsName(ri3.getName()));
+        assertTrue(roster.containsName(name));
     }
 }
