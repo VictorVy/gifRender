@@ -24,6 +24,9 @@ class RosterTest {
     public void constructorTest() {
         assertTrue(roster.isEmpty());
         assertEquals(0, roster.size());
+
+        assertTrue(roster.getNames().isEmpty());
+        assertEquals(0, roster.getNames().size());
     }
 
     @Test
@@ -33,6 +36,10 @@ class RosterTest {
         assertFalse(roster.isEmpty());
         assertEquals(1, roster.size());
         assertEquals(ri1, roster.getItem(0));
+
+        assertFalse(roster.getNames().isEmpty());
+        assertEquals(1, roster.getNames().size());
+        assertTrue(roster.containsName(ri1.getName()));
     }
     @Test
     public void addTestMultipleTimes() {
@@ -43,6 +50,11 @@ class RosterTest {
         assertEquals(2, roster.size());
         assertEquals(ri1, roster.getItem(0));
         assertEquals(ri2, roster.getItem(1));
+
+        assertFalse(roster.getNames().isEmpty());
+        assertEquals(2, roster.getNames().size());
+        assertTrue(roster.containsName(ri1.getName()));
+        assertTrue(roster.containsName(ri2.getName()));
     }
 
     @Test
@@ -52,6 +64,9 @@ class RosterTest {
 
         assertTrue(roster.isEmpty());
         assertEquals(0, roster.size());
+
+        assertTrue(roster.getNames().isEmpty());
+        assertEquals(0, roster.getNames().size());
     }
     @Test
     public void removeTestOutOfBounds() {
@@ -60,20 +75,31 @@ class RosterTest {
         assertThrows(IndexOutOfBoundsException.class, () -> roster.remove(-1));
         assertThrows(IndexOutOfBoundsException.class, () -> roster.remove(1));
 
+        assertFalse(roster.isEmpty());
         assertEquals(ri1, roster.getItem(0));
         assertEquals(1, roster.size());
+
+        assertFalse(roster.getNames().isEmpty());
+        assertEquals(1, roster.getNames().size());
+        assertTrue(roster.containsName(ri1.getName()));
     }
     @Test
     public void removeTestMultipleTimes() {
         roster.add(ri1);
         roster.add(ri2);
-        roster.add(ri1);
+        roster.add(ri3);
         roster.remove(0);
         roster.remove(1);
 
         assertFalse(roster.isEmpty());
         assertEquals(1, roster.size());
         assertEquals(ri2, roster.getItem(0));
+
+        assertFalse(roster.getNames().isEmpty());
+        assertEquals(1, roster.getNames().size());
+        assertFalse(roster.containsName(ri1.getName()));
+        assertTrue(roster.containsName(ri2.getName()));
+        assertFalse(roster.containsName(ri3.getName()));
     }
 
     @Test
@@ -84,6 +110,9 @@ class RosterTest {
 
         assertTrue(roster.isEmpty());
         assertEquals(0, roster.size());
+
+        assertTrue(roster.getNames().isEmpty());
+        assertEquals(0, roster.getNames().size());
     }
 
     @Test
@@ -223,5 +252,20 @@ class RosterTest {
         assertEquals(ri1, roster.getItem(0));
         assertEquals(ri2, roster.getItem(1));
         assertEquals(ri3, roster.getItem(2));
+    }
+
+    @Test
+    public void containsTest() {
+        roster.add(ri1);
+        roster.add(ri2);
+        roster.add(ri3);
+
+        assertTrue(roster.containsName(ri1.getName()));
+        assertTrue(roster.containsName(ri2.getName()));
+        assertTrue(roster.containsName(ri3.getName()));
+
+        assertFalse(roster.containsName(" " + ri1.getName()));
+        assertFalse(roster.containsName("._." + ri2.getName()));
+        assertFalse(roster.containsName("T.T" + ri3.getName()));
     }
 }

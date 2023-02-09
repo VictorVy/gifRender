@@ -161,7 +161,6 @@ public class GifRenderApp {
             } else {
                 addImage(file);
             }
-            System.out.println(file.getName() + " added to roster.");
         } catch (InvalidPathException | FileNotFoundException e) {
             System.out.println("Invalid file path!");
         } catch (IOException e) {
@@ -173,20 +172,34 @@ public class GifRenderApp {
 
     // REQUIRES: file is an image file of type png, jpg, or bmp
     // MODIFIES: this
-    // EFFECTS: adds the image file to the roster as a RosterItem
+    // EFFECTS: adds the image file to the roster as a RosterItem, if no name collision
     private void addImage(File file) throws Exception {
-        roster.add(new RosterItem(ImageIO.read(file), file.getName()));
+        String n = file.getName();
+
+        if (roster.containsName(n)) {
+            System.out.println("An item named " + n + " already exists!");
+        } else {
+            roster.add(new RosterItem(ImageIO.read(file), n));
+            System.out.println(n + " added to roster.");
+        }
     }
 
     // REQUIRES: file is a gif file
     // MODIFIES: this
-    // EFFECTS: adds the frames of the gif file to the roster as RosterItems
+    // EFFECTS: adds the frames of the gif file to the roster as RosterItems, if no name collisions
     private void addGif(File file) throws Exception {
         String name = file.getName().substring(0, file.getName().lastIndexOf("."));
         List<GIFFrame> frames = IOUtils.parseGif(file);
 
         for (int i = 0; i < frames.size(); i++) {
-            roster.add(new RosterItem(frames.get(i), name + "_" + i + ".png"));
+            String n = name + "_" + i + ".png";
+
+            if (roster.containsName(n)) {
+                System.out.println("An item named " + n + " already exists!");
+            } else {
+                roster.add(new RosterItem(frames.get(i), n));
+                System.out.println(n + " added to roster.");
+            }
         }
     }
 
