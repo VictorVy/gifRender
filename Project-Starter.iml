@@ -32,5 +32,15 @@
     <orderEntry type="library" exported="" name="log4j-1.2.17" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.12" level="project" />
     <orderEntry type="library" exported="" name="jai_imageio" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library name="json-java">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/json-20220924.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="json-20220924" level="project" />
   </component>
 </module>

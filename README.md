@@ -31,4 +31,6 @@ so I decided this would be a good opportunity to create a new project that would
 - As a user, I want to be able to view the items in my roster, along with their details
 - As a user, I want to be able to output a GIF comprised of the images in my roster
 - As a user, I want to be able to rend a GIF into its component images, arranged in my roster
-- As a user, I want to be able to save one or more frames from my roster
+- As a user, I want to be able to download one or more individual items from my roster
+- As a user, I want to be able to save the state of my roster for later
+- As a user, I want to be able to load my previously saved roster
