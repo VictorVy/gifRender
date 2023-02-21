@@ -468,10 +468,6 @@ public class GifRenderApp {
 
     // EFFECTS: saves the roster
     private void saveRoster() {
-        if (rosterIsEmpty()) {
-            return;
-        }
-
         try {
             jsonWriter.open();
             jsonWriter.write(roster);
