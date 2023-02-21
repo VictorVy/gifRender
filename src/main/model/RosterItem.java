@@ -1,21 +1,33 @@
 package model;
 
 import com.icafe4j.image.gif.GIFFrame;
+import org.json.JSONObject;
+import persistence.Writable;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 
 // Represents a single frame of the output gif
-public class RosterItem {
+public class RosterItem implements Writable {
     private BufferedImage image;
     private GIFFrame frame;
     private String name;
     private int width;
     private int height;
     private int delay;
+    private int transparency;
 
     // EFFECTS: constructs a new RosterItem based on the given BufferedImage and name
     public RosterItem(BufferedImage image, String name) {
         this(new GIFFrame(image), name);
+    }
+
+    // EFFECTS: constructs a new RosterItem based on the given BufferedImage, name, and transparency flag
+    public RosterItem(BufferedImage image, String name, int transparency) {
+        this(new GIFFrame(image, 0, 0, 0, 2, 0, transparency, 255), name);
     }
 
     // EFFECTS: constructs a new RosterItem based on the given GIFFrame and name
@@ -29,6 +41,7 @@ public class RosterItem {
         width = image.getWidth();
         height = image.getHeight();
         delay = frame.getDelay() * 10;
+        transparency = frame.getTransparencyFlag();
     }
 
     public BufferedImage getImage() {
@@ -70,5 +83,38 @@ public class RosterItem {
         int d = (int) Math.round(delay / 10.0) * 10;
         this.delay = d;
         frame = ModelUtils.copyExceptDelay(frame, d);
+    }
+
+    public int getTransparency() {
+        return transparency;
+    }
+
+
+    public int getTransparentColor() {
+        return frame.getTransparentColor();
+    }
+
+    public int getDisposableMethod() {
+        return frame.getDisposalMethod();
+    }
+
+    // EFFECTS: returns JSON representation of this item
+    @Override
+    public JSONObject toJson() throws IOException {
+        JSONObject json = new JSONObject();
+
+        // https://stackoverflow.com/questions/15414259/java-bufferedimage-to-byte-array-and-back
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", output);
+        byte[] imageBytes = output.toByteArray();
+
+        String imageString = Base64.getEncoder().encodeToString(imageBytes);
+
+        json.put("name", name);
+        json.put("image", imageString);
+        json.put("delay", delay);
+        json.put("transparency", transparency);
+
+        return json;
     }
 }

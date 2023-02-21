@@ -11,17 +11,20 @@ import static org.junit.jupiter.api.Assertions.*;
 class RosterItemTest {
     RosterItem ri1;
     RosterItem ri2;
+    RosterItem ri3;
     String name1 = "test1.png";
     String name2 = "test2.jpg";
     BufferedImage img1 = new BufferedImage(100, 100, 1);
     BufferedImage img2 = new BufferedImage(1920, 1080, 1);
     GIFFrame frame1 = new GIFFrame(img1);
     GIFFrame frame2 = new GIFFrame(img2);
+    GIFFrame frame3 = new GIFFrame(img1, 0, 0, 0, 2, 0, 1, 255);
 
     @BeforeEach
     public void runBefore() {
         ri1 = new RosterItem(img1, "test1.png");
         ri2 = new RosterItem(frame2, "test2.jpg");
+        ri3 = new RosterItem(img1, "test1.png", 1);
     }
 
     @Test
@@ -32,6 +35,7 @@ class RosterItemTest {
         assertEquals(img1.getWidth(), ri1.getWidth());
         assertEquals(img1.getHeight(), ri1.getHeight());
         assertEquals(0, ri1.getDelay());
+        assertEquals(0, ri1.getTransparency());
 
         assertEquals(img2, ri2.getImage());
         assertEquals(frame2, ri2.getFrame());
@@ -39,6 +43,17 @@ class RosterItemTest {
         assertEquals(img2.getWidth(), ri2.getWidth());
         assertEquals(img2.getHeight(), ri2.getHeight());
         assertEquals(0, ri2.getDelay());
+        assertEquals(0, ri2.getTransparency());
+
+        assertEquals(img1, ri3.getImage());
+        assertTrue(ModelUtilsTest.frameEquals(frame3, ri3.getFrame()));
+        assertEquals(name1, ri3.getName());
+        assertEquals(img1.getWidth(), ri3.getWidth());
+        assertEquals(img1.getHeight(), ri3.getHeight());
+        assertEquals(0, ri3.getDelay());
+        assertEquals(1, ri3.getTransparency());
+        assertEquals(2, ri3.getDisposableMethod());
+        assertEquals(255, ri3.getTransparentColor());
     }
 
     @Test

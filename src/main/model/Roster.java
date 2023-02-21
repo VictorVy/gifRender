@@ -1,12 +1,16 @@
 package model;
 
 import com.icafe4j.image.gif.GIFFrame;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import persistence.Writable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 // Represents the collection of frames comprising the output gif
-public class Roster {
+public class Roster implements Writable {
     ArrayList<RosterItem> items;
     HashSet<String> names;
 
@@ -114,5 +118,24 @@ public class Roster {
     public void rename(String name, String newName) {
         names.remove(name.toLowerCase());
         names.add(newName.toLowerCase());
+    }
+
+    // EFFECTS: returns JSON representation of the roster
+    @Override
+    public JSONObject toJson() throws IOException {
+        JSONObject json = new JSONObject();
+        json.put("items", itemsToJson());
+        return json;
+    }
+
+    // EFFECTS: returns roster items as a JSON array
+    private JSONArray itemsToJson() throws IOException {
+        JSONArray jsonArray = new JSONArray();
+
+        for (RosterItem i : items) {
+            jsonArray.put(i.toJson());
+        }
+
+        return jsonArray;
     }
 }

@@ -4,6 +4,8 @@ import com.icafe4j.image.ImageIO;
 import com.icafe4j.image.gif.GIFFrame;
 import model.Roster;
 import model.RosterItem;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -18,18 +20,24 @@ public class GifRenderApp {
     private BufferedReader br;
     private Roster roster;
 
-    private final String manComm = "man";
-    private final String exitComm = "exit";
-    private final String clearComm = "clear";
-    private final String viewRosterComm = "vr";
-    private final String addComm = "add ";
-    private final String removeComm = "rm ";
-    private final String swapComm = "sw ";
-    private final String shiftComm = "sh ";
-    private final String renameComm = "ren ";
-    private final String downloadComm = "down ";
-    private final String delayComm = "d ";
-    private final String outputComm = "out";
+    private JsonWriter jsonWriter;
+    private JsonReader jsonReader;
+    private static final String JSON_STORE = "./data/roster.json";
+
+    private static final String MAN_COMM = "man";
+    private static final String EXIT_COMM = "exit";
+    private static final String CLEAR_COMM = "clear";
+    private static final String VIEW_ROSTER_COMM = "vr";
+    private static final String ADD_COMM = "add ";
+    private static final String REMOVE_COMM = "rm ";
+    private static final String SWAP_COMM = "sw ";
+    private static final String SHIFT_COMM = "sh ";
+    private static final String RENAME_COMM = "ren ";
+    private static final String DOWNLOAD_COMM = "down ";
+    private static final String DELAY_COMM = "d ";
+    private static final String OUTPUT_COMM = "out";
+    private static final String SAVE_COMM = "sv";
+    private static final String LOAD_COMM = "ld";
 
     // EFFECTS: runs gifRender
     public GifRenderApp() {
@@ -51,7 +59,7 @@ public class GifRenderApp {
             try {
                 String input = br.readLine();
 
-                if (input.equals(exitComm)) {
+                if (input.equals(EXIT_COMM)) {
                     break;
                 }
 
@@ -75,34 +83,41 @@ public class GifRenderApp {
     private void init() {
         br = new BufferedReader(new InputStreamReader(System.in));
         roster = new Roster();
+
+        jsonWriter = new JsonWriter(JSON_STORE);
+        jsonReader = new JsonReader(JSON_STORE);
     }
 
     // MODIFIES: this
     // EFFECTS: delegates tasks to appropriate method based on input
     @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private void handleInput(String input) throws Exception {
-        if (input.equals(manComm)) {
+        if (input.equals(MAN_COMM)) {
             printManual();
-        } else if (input.equals(clearComm)) {
+        } else if (input.equals(CLEAR_COMM)) {
             clearScreen();
-        } else if (input.equals(viewRosterComm)) {
+        } else if (input.equals(VIEW_ROSTER_COMM)) {
             viewRoster();
-        } else if (input.startsWith(addComm)) {
-            addItem(input.substring(addComm.length()));
-        } else if (input.startsWith(removeComm)) {
-            handleRemove(input.substring(removeComm.length()));
-        } else if (input.startsWith(swapComm)) {
-            swapItems(input.substring(swapComm.length()));
-        } else if (input.startsWith(shiftComm)) {
-            shiftItems(input.substring(shiftComm.length()));
-        } else if (input.startsWith(renameComm)) {
-            renameItem(Integer.parseInt(input.substring(renameComm.length())));
-        } else if (input.startsWith(downloadComm)) {
-            handleDownload(input.substring(downloadComm.length()));
-        } else if (input.startsWith(delayComm)) {
-            handleDelay(input.substring(delayComm.length()));
-        } else if (input.equals(outputComm)) {
+        } else if (input.startsWith(ADD_COMM)) {
+            addItem(input.substring(ADD_COMM.length()));
+        } else if (input.startsWith(REMOVE_COMM)) {
+            handleRemove(input.substring(REMOVE_COMM.length()));
+        } else if (input.startsWith(SWAP_COMM)) {
+            swapItems(input.substring(SWAP_COMM.length()));
+        } else if (input.startsWith(SHIFT_COMM)) {
+            shiftItems(input.substring(SHIFT_COMM.length()));
+        } else if (input.startsWith(RENAME_COMM)) {
+            renameItem(Integer.parseInt(input.substring(RENAME_COMM.length())));
+        } else if (input.startsWith(DOWNLOAD_COMM)) {
+            handleDownload(input.substring(DOWNLOAD_COMM.length()));
+        } else if (input.startsWith(DELAY_COMM)) {
+            handleDelay(input.substring(DELAY_COMM.length()));
+        } else if (input.equals(OUTPUT_COMM)) {
             outputRoster();
+        } else if (input.equals(SAVE_COMM)) {
+            saveRoster();
+        } else if (input.equals(LOAD_COMM)) {
+            loadRoster();
         } else {
             System.out.println("Invalid command!");
         }
@@ -111,25 +126,27 @@ public class GifRenderApp {
     // EFFECTS: prints the list of commands to the console
     private void printManual() {
         System.out.println("Available commands:\n\n"
-                + "> " + manComm + "\n\tPrint this manual.\n\n"
-                + "> " + clearComm + "\n\tClear the console.\n\n"
-                + "> " + exitComm + "\n\tExit the program.\n\n"
-                + "> " + viewRosterComm + "\n\tView all items in the image roster.\n\n"
-                + "> " + addComm + "p\n\tAdd the image or gif at path p to the roster.\n\t\t"
-                + addComm + "D:\\Pictures\\example.png\n\n"
-                + "> " + removeComm + "i\n\tRemove the item at index i from the roster.\n\t\t"
-                + removeComm + "0\n\t\t" + removeComm + "all\n\n"
-                + "> " + swapComm + "a b\n\tSwap the positions of the items at index a and index b.\n\t\t"
-                + swapComm + "42 19\n\n"
-                + "> " + shiftComm + "a b\n\tShift the position of the item at index a to index b.\n\t\t"
-                + shiftComm + "42 19\n\n"
-                + "> " + renameComm + "i\n\tRename the item at index i.\n\t\t"
-                + renameComm + "0\n\n"
-                + "> " + downloadComm + "i\n\tDownload the item at index i.\n\t\t"
-                + downloadComm + "0\n\t\t" + downloadComm + "all\n\n"
-                + "> " + delayComm + "i\n\tSet the delay of the item at index i. Rounded to the nearest 10 ms.\n\t\t"
-                + delayComm + "0\n\t\t" + delayComm + "all\n\n"
-                + "> " + outputComm + "\n\tOutput the roster as a gif.");
+                + "> " + MAN_COMM + "\n\tPrint this manual.\n\n"
+                + "> " + CLEAR_COMM + "\n\tClear the console.\n\n"
+                + "> " + EXIT_COMM + "\n\tExit the program.\n\n"
+                + "> " + VIEW_ROSTER_COMM + "\n\tView all items in the image roster.\n\n"
+                + "> " + ADD_COMM + "p\n\tAdd the image or gif at path p to the roster.\n\t\t"
+                + ADD_COMM + "D:\\Pictures\\example.png\n\n"
+                + "> " + REMOVE_COMM + "i\n\tRemove the item at index i from the roster.\n\t\t"
+                + REMOVE_COMM + "0\n\t\t" + REMOVE_COMM + "all\n\n"
+                + "> " + SWAP_COMM + "a b\n\tSwap the positions of the items at index a and index b.\n\t\t"
+                + SWAP_COMM + "42 19\n\n"
+                + "> " + SHIFT_COMM + "a b\n\tShift the position of the item at index a to index b.\n\t\t"
+                + SHIFT_COMM + "42 19\n\n"
+                + "> " + RENAME_COMM + "i\n\tRename the item at index i.\n\t\t"
+                + RENAME_COMM + "0\n\n"
+                + "> " + DOWNLOAD_COMM + "i\n\tDownload the item at index i.\n\t\t"
+                + DOWNLOAD_COMM + "0\n\t\t" + DOWNLOAD_COMM + "all\n\n"
+                + "> " + DELAY_COMM + "i\n\tSet the delay of the item at index i. Rounded to the nearest 10 ms.\n\t\t"
+                + DELAY_COMM + "0\n\t\t" + DELAY_COMM + "all\n\n"
+                + "> " + OUTPUT_COMM + "\n\tOutput the roster as a gif.\n\n"
+                + "> " + SAVE_COMM + "\n\tSave the roster.\n\n"
+                + "> " + LOAD_COMM + "\n\tLoad the saved roster.");
     }
 
     // EFFECTS: "clears" the console
@@ -438,12 +455,45 @@ public class GifRenderApp {
         }
     }
 
-    // EFFECTS: if the roster is empty, notify the user and return true; otherwise return false
+    // EFFECTS: if the roster is empty, notifies the user and returns true; otherwise returns false
     private boolean rosterIsEmpty() {
         if (roster.isEmpty()) {
             System.out.println("Your roster is empty!");
         }
 
         return roster.isEmpty();
+    }
+
+    // adapted from CPSC 210 JsonSerializationDemo at https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+
+    // EFFECTS: saves the roster
+    private void saveRoster() {
+        if (rosterIsEmpty()) {
+            return;
+        }
+
+        try {
+            jsonWriter.open();
+            jsonWriter.write(roster);
+            jsonWriter.close();
+            System.out.println("Saved roster to " + JSON_STORE);
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to write to file: " + JSON_STORE);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: loads saved roster
+    private void loadRoster() {
+        try {
+            roster = jsonReader.read();
+            System.out.println("Loaded roster from " + JSON_STORE);
+        } catch (IOException e) {
+            System.out.println("No saved roster.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
