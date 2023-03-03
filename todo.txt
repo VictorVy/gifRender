@@ -1,6 +1,7 @@
-bug list
+known bugs
 - top/left position jank
 - gifframe properties
+- downloads don't preserve transparency
 
 to ask
 - toJson tests
