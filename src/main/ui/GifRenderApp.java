@@ -7,6 +7,8 @@ import model.RosterItem;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.InvalidPathException;
@@ -16,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 
 // gifRender application
-public class GifRenderApp {
+public class GifRenderApp extends JFrame {
     private BufferedReader br;
     private Roster roster;
 
@@ -39,9 +41,50 @@ public class GifRenderApp {
     private static final String SAVE_COMM = "sv";
     private static final String LOAD_COMM = "ld";
 
+    private static final int SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+    private static final int SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+
+    private static final Color BG_COLOUR = new Color(50, 50, 50);
+    private static final Color ROSTER_BG_COLOUR = new Color(100, 100, 100);
+    private static final Color BUTTON_BG_COLOUR = new Color(255, 75, 75);
+
     // EFFECTS: runs gifRender
     public GifRenderApp() {
+        super("gifRender");
+        initFrame();
+
+        JPanel rosterPanel = new JPanel();
+        rosterPanel.setBackground(ROSTER_BG_COLOUR);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(BUTTON_BG_COLOUR);
+
+        add(rosterPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.NORTH);
+
+        setVisible(true);
+
         run();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: sets up JFrame properties
+    private void initFrame() {
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        setSize(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+        setLocation(SCREEN_WIDTH / 2 - getWidth() / 2, SCREEN_HEIGHT / 2 - getHeight() / 2);
+
+        setLayout(new BorderLayout(20, 20));
+        ((JPanel) getContentPane()).setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+
+        try {
+            setIconImage(ImageIO.read(new File("./data/icon.png")));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        getContentPane().setBackground(BG_COLOUR);
     }
 
     // MODIFIES: this
@@ -231,7 +274,7 @@ public class GifRenderApp {
     // EFFECTS: delegates the remove command to appropriate method
     private void handleRemove(String input) throws IOException {
         if (input.equals("all")) {
-            removeAll();
+            removeAllItems();
         } else {
             removeItem(Integer.parseInt(input));
         }
@@ -248,7 +291,7 @@ public class GifRenderApp {
 
     // MODIFIES: this
     // EFFECTS: removes all items from the roster
-    private void removeAll() throws IOException {
+    private void removeAllItems() throws IOException {
         if (rosterIsEmpty()) {
             return;
         }
