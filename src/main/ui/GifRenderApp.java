@@ -9,6 +9,7 @@ import persistence.JsonWriter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.InvalidPathException;
@@ -104,14 +105,18 @@ public class GifRenderApp extends JFrame {
 
         JMenuItem saveItem = new JMenuItem("Save");
         saveItem.addActionListener(e -> saveRoster());
+        saveItem.setMnemonic(KeyEvent.VK_S);
         JMenuItem loadItem = new JMenuItem("Load");
         loadItem.addActionListener(e -> loadRoster());
+        loadItem.setMnemonic(KeyEvent.VK_L);
         JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
+        exitItem.setMnemonic(KeyEvent.VK_E);
 
         fileMenu.add(saveItem);
         fileMenu.add(loadItem);
         fileMenu.add(exitItem);
+        fileMenu.setMnemonic(KeyEvent.VK_F);
 
         menuBar.add(fileMenu);
 
