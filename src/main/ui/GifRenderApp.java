@@ -51,18 +51,8 @@ public class GifRenderApp extends JFrame {
     // EFFECTS: runs gifRender
     public GifRenderApp() {
         super("gifRender");
+
         initFrame();
-
-        JPanel rosterPanel = new JPanel();
-        rosterPanel.setBackground(ROSTER_BG_COLOUR);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(BUTTON_BG_COLOUR);
-
-        add(rosterPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.NORTH);
-
-        setVisible(true);
 
         run();
     }
@@ -81,11 +71,53 @@ public class GifRenderApp extends JFrame {
         try {
             setIconImage(ImageIO.read(new File("./data/icon.png")));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         getContentPane().setBackground(BG_COLOUR);
+
+        addChildren();
+
+        setVisible(true);
     }
+
+    // MODIFIES: this
+    // EFFECTS: adds subcomponents to the frame
+    private void addChildren() {
+        JPanel rosterPanel = new JPanel();
+        rosterPanel.setBackground(ROSTER_BG_COLOUR);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(BUTTON_BG_COLOUR);
+
+        add(rosterPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.NORTH);
+        setJMenuBar(initMenuBar());
+    }
+
+    // MODIFIES: this
+    // EFFECTS: initializes menu bar
+    private JMenuBar initMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("File");
+
+        JMenuItem saveItem = new JMenuItem("Save");
+        saveItem.addActionListener(e -> saveRoster());
+        JMenuItem loadItem = new JMenuItem("Load");
+        loadItem.addActionListener(e -> loadRoster());
+        JMenuItem exitItem = new JMenuItem("Exit");
+        exitItem.addActionListener(e -> System.exit(0));
+
+        fileMenu.add(saveItem);
+        fileMenu.add(loadItem);
+        fileMenu.add(exitItem);
+
+        menuBar.add(fileMenu);
+
+        return menuBar;
+    }
+
 
     // MODIFIES: this
     // EFFECTS: main user interface loop

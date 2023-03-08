@@ -1,3 +1,10 @@
+next
+- file chooser
+- drag/drop to add files
+- remove files
+- change delays
+- adapt rest of phase 1 to gui
+
 known bugs
 - top/left position jank
 - gifframe properties
