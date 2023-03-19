@@ -42,12 +42,18 @@ public class GifRenderApp extends JFrame {
     private static final String SAVE_COMM = "sv";
     private static final String LOAD_COMM = "ld";
 
-    private static final int SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-    private static final int SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+    public static final int SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+    public static final int SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 
-    private static final Color BG_COLOUR = new Color(50, 50, 50);
-    private static final Color ROSTER_BG_COLOUR = new Color(100, 100, 100);
-    private static final Color BUTTON_BG_COLOUR = new Color(255, 75, 75);
+    public static final Color BG_COLOUR = new Color(50, 50, 50);
+    public static final Color ROSTER_BG_COLOUR = new Color(100, 100, 100);
+    public static final Color BUTTON_BG_COLOUR = new Color(255, 75, 75);
+
+    private JPanel rosterPanel;
+    private JPanel buttonPanel;
+
+    public static final int MAX_THUMB_WIDTH = 150;
+    public static final int MAX_THUMB_HEIGHT = 150;
 
     // EFFECTS: runs gifRender
     public GifRenderApp() {
@@ -85,13 +91,16 @@ public class GifRenderApp extends JFrame {
     // MODIFIES: this
     // EFFECTS: adds subcomponents to the frame
     private void addChildren() {
-        JPanel rosterPanel = new JPanel();
-        rosterPanel.setBackground(ROSTER_BG_COLOUR);
+        rosterPanel = new RosterPanel();
 
-        JPanel buttonPanel = new JPanel();
+        JScrollPane rosterScroll = new JScrollPane(rosterPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        rosterScroll.setBackground(Color.BLUE);
+
+        buttonPanel = new JPanel();
         buttonPanel.setBackground(BUTTON_BG_COLOUR);
 
-        add(rosterPanel, BorderLayout.CENTER);
+        add(rosterScroll, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.NORTH);
         setJMenuBar(initMenuBar());
     }
@@ -106,9 +115,11 @@ public class GifRenderApp extends JFrame {
         JMenuItem saveItem = new JMenuItem("Save");
         saveItem.addActionListener(e -> saveRoster());
         saveItem.setMnemonic(KeyEvent.VK_S);
+
         JMenuItem loadItem = new JMenuItem("Load");
         loadItem.addActionListener(e -> loadRoster());
         loadItem.setMnemonic(KeyEvent.VK_L);
+
         JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
         exitItem.setMnemonic(KeyEvent.VK_E);
@@ -123,9 +134,29 @@ public class GifRenderApp extends JFrame {
         return menuBar;
     }
 
+    // MODIFIES: this
+    // EFFECTS: refreshes the displayed roster
+    private void updateRosterPanel() {
+//        rosterPanel.removeAll();
+
+        for (int i = 0; i < roster.getItems().size(); i++) {
+            // inefficient, but backwards compatible with phase 2 model
+            rosterPanel.add(new ItemPanel(roster.getItem(i), i));
+        }
+
+        refreshRosterPanel();
+    }
 
     // MODIFIES: this
-    // EFFECTS: main user interface loop
+    // EFFECTS: displays changes to rosterPanel
+    private void refreshRosterPanel() {
+        // https://stackoverflow.com/questions/1097366/java-swing-revalidate-vs-repaint
+        rosterPanel.repaint();
+        rosterPanel.revalidate();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: console user interface loop
     public void run() {
         init();
 
@@ -286,6 +317,8 @@ public class GifRenderApp extends JFrame {
             roster.add(new RosterItem(ImageIO.read(file), n));
             System.out.println(n + " added to roster.");
         }
+
+        updateRosterPanel();
     }
 
     // REQUIRES: file is a gif file
@@ -305,6 +338,8 @@ public class GifRenderApp extends JFrame {
                 System.out.println(n + " added to roster.");
             }
         }
+
+        updateRosterPanel();
     }
 
     // MODIFIES: this

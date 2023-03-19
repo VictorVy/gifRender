@@ -6,6 +6,7 @@ import com.icafe4j.image.gif.GIFFrame;
 import com.icafe4j.image.gif.GIFTweaker;
 import com.icafe4j.image.reader.GIFReader;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,5 +66,30 @@ public class IOUtils {
         inputStream.close();
 
         return reader.getGIFFrames();
+    }
+
+    // EFFECTS: returns a thumbnail of the given image, with given size
+    public static BufferedImage makeThumb(BufferedImage image, int maxWidth, int maxHeight) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+                height *= (double) maxWidth / width;
+                width = maxWidth;
+            } else {
+                width *= (double) maxHeight / height;
+                height = maxHeight;
+            }
+        }
+
+        BufferedImage thumb = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = thumb.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(image, 0, 0, width, height, 0, 0, image.getWidth(),
+                image.getHeight(), null);
+        g.dispose();
+
+        return thumb;
     }
 }

@@ -9,6 +9,8 @@ known bugs
 - top/left position jank
 - gifframe properties
 - downloads don't preserve transparency
+- rosterPane white edges
+- the scrolling is GIGA-BROKEN but i've spent far too many hours on trying to fix it already
 
 to ask
 - toJson tests
