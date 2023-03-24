@@ -19,10 +19,10 @@ public class ItemPanel extends JPanel {
         setLayout(new BorderLayout(5, 5));
 
         JLabel indexLabel = new JLabel(index + ": " + item.getName(), SwingConstants.CENTER);
-        indexLabel.setForeground(Color.WHITE);
+        indexLabel.setForeground(GifRenderApp.TEXT_COLOUR);
 
         JLabel delayLabel = new JLabel("delay: " + item.getDelay() + " ms", SwingConstants.CENTER);
-        delayLabel.setForeground(Color.WHITE);
+        delayLabel.setForeground(GifRenderApp.TEXT_COLOUR);
 
         add(indexLabel, BorderLayout.NORTH);
         add(new JLabel(new ImageIcon(thumbnail)), BorderLayout.CENTER);
@@ -30,6 +30,6 @@ public class ItemPanel extends JPanel {
 
         setFont(new Font("Courier", Font.PLAIN, 20));
         setToolTipText(item.getWidth() + " x " + item.getHeight());
-        setBackground(GifRenderApp.ROSTER_BG_COLOUR);
+        setBackground(GifRenderApp.PANEL_COLOUR);
     }
 }

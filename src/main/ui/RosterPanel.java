@@ -8,7 +8,7 @@ public class RosterPanel extends JPanel {
     public RosterPanel() {
         super();
 
-        setBackground(GifRenderApp.ROSTER_BG_COLOUR);
+        setBackground(GifRenderApp.PANEL_COLOUR);
         setLayout(new FlowLayout(FlowLayout.LEADING, 20, 20));
     }
 }

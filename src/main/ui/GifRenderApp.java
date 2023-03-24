@@ -10,6 +10,8 @@ import persistence.JsonWriter;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -46,9 +48,9 @@ public class GifRenderApp extends JFrame {
     public static final int SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
     public static final int SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 
-    public static final Color BG_COLOUR = new Color(50, 50, 50);
-    public static final Color ROSTER_BG_COLOUR = new Color(100, 100, 100);
-    public static final Color BUTTON_BG_COLOUR = new Color(255, 75, 75);
+    public static final Color BG_COLOUR = new Color(50, 50, 55);
+    public static final Color PANEL_COLOUR = new Color(100, 100, 105);
+    public static final Color TEXT_COLOUR = new Color(210, 210, 215);
 
     private JPanel rosterPanel;
     private JPanel buttonPanel;
@@ -60,8 +62,7 @@ public class GifRenderApp extends JFrame {
     public GifRenderApp() {
         super("gifRender");
 
-        initFrame();
-
+        init();
         run();
     }
 
@@ -86,6 +87,7 @@ public class GifRenderApp extends JFrame {
 
         addChildren();
 
+        updateRosterPanel();
         setVisible(true);
     }
 
@@ -93,17 +95,45 @@ public class GifRenderApp extends JFrame {
     // EFFECTS: adds subcomponents to the frame
     private void addChildren() {
         rosterPanel = new RosterPanel();
+        dragDropInit();
 
         JScrollPane rosterScroll = new JScrollPane(rosterPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        rosterScroll.setBackground(Color.BLUE);
+        rosterScroll.getHorizontalScrollBar().setUnitIncrement(64);
 
         buttonPanel = new JPanel();
-        buttonPanel.setBackground(BUTTON_BG_COLOUR);
+        buttonPanel.setBackground(PANEL_COLOUR);
 
         add(rosterScroll, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.NORTH);
         setJMenuBar(initMenuBar());
+    }
+
+    // MODIFIES: this
+    // EFFECTS: initializes drag and drop functionality
+    private void dragDropInit() {
+        // https://stackoverflow.com/questions/811248/how-can-i-use-drag-and-drop-in-swing-to-get-file-path
+        rosterPanel.setTransferHandler(new TransferHandler() {
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+            }
+
+            @Override
+            public boolean importData(TransferSupport support) {
+                if (!canImport(support)) {
+                    return false;
+                }
+
+                try {
+                    addItems((List<File>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor));
+                } catch (UnsupportedFlavorException | IOException e) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
     }
 
     // MODIFIES: this
@@ -130,8 +160,10 @@ public class GifRenderApp extends JFrame {
         exitItem.setMnemonic(KeyEvent.VK_E);
 
         fileMenu.add(addItem);
+        fileMenu.add(new JSeparator());
         fileMenu.add(saveItem);
         fileMenu.add(loadItem);
+        fileMenu.add(new JSeparator());
         fileMenu.add(exitItem);
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
@@ -158,8 +190,6 @@ public class GifRenderApp extends JFrame {
             }
         });
 
-
-
         if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             File[] files = fileChooser.getSelectedFiles();
 
@@ -174,9 +204,15 @@ public class GifRenderApp extends JFrame {
     private void updateRosterPanel() {
         rosterPanel.removeAll();
 
-        for (int i = 0; i < roster.getItems().size(); i++) {
+        for (int i = 0; i < roster.size(); i++) {
             // inefficient, but backwards compatible with phase 2 model
             rosterPanel.add(new ItemPanel(roster.getItem(i), i));
+        }
+
+        if (roster.size() == 0) {
+            JLabel emptyLabel = new JLabel("Add items or drag and drop");
+            emptyLabel.setForeground(TEXT_COLOUR);
+            rosterPanel.add(emptyLabel);
         }
 
         refreshRosterPanel();
@@ -193,8 +229,6 @@ public class GifRenderApp extends JFrame {
     // MODIFIES: this
     // EFFECTS: console user interface loop
     public void run() {
-        init();
-
         System.out.println("Welcome to gifRender.\n"
                 + "To view the manual, type \"man\".\n"
                 + "Happy rending!");
@@ -232,6 +266,8 @@ public class GifRenderApp extends JFrame {
 
         jsonWriter = new JsonWriter(JSON_STORE);
         jsonReader = new JsonReader(JSON_STORE);
+
+        initFrame();
     }
 
     // MODIFIES: this
@@ -316,6 +352,15 @@ public class GifRenderApp extends JFrame {
         }
     }
 
+    // REQUIRES: file contains only valid image or gif files
+    // MODIFIES: this
+    // EFFECTS: adds the files to the roster
+    private void addItems(List<File> files) {
+        for (File file : files) {
+            addItem(file);
+        }
+    }
+
     // REQUIRES: inputPath is a valid path to an image or gif file
     // MODIFIES: this
     // EFFECTS: adds the file at inputPath to the roster
@@ -323,7 +368,7 @@ public class GifRenderApp extends JFrame {
         addItem(Paths.get(inputPath).toFile());
     }
 
-    // REQUIRES: file is a valid file
+    // REQUIRES: file is a valid image or gif file
     // MODIFIES: this
     // EFFECTS: adds the file to the roster
     private void addItem(File file) {
