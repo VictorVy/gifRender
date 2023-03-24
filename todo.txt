@@ -1,9 +1,10 @@
 next
-- file chooser
-- drag/drop to add files
-- remove files
-- change delays
-- adapt rest of phase 1 to gui
+- add operationator
+    - remove files
+    - change delays
+    - change positions
+    - change names
+    - output
 
 known bugs
 - top/left position jank
@@ -11,6 +12,3 @@ known bugs
 - downloads don't preserve transparency
 - rosterPane white edges
 - the scrolling is GIGA-BROKEN but i've spent far too many hours on trying to fix it already
-
-to ask
-- toJson tests
