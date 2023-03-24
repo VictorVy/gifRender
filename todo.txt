@@ -5,6 +5,7 @@ next
     - change positions
     - change names
     - output
+- add instructions for grader
 
 known bugs
 - top/left position jank
