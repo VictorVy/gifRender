@@ -8,6 +8,7 @@ import persistence.JsonReader;
 import persistence.JsonWriter;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -112,6 +113,10 @@ public class GifRenderApp extends JFrame {
 
         JMenu fileMenu = new JMenu("File");
 
+        JMenuItem addItem = new JMenuItem("Add");
+        addItem.addActionListener(e -> addFiles());
+        addItem.setMnemonic(KeyEvent.VK_A);
+
         JMenuItem saveItem = new JMenuItem("Save");
         saveItem.addActionListener(e -> saveRoster());
         saveItem.setMnemonic(KeyEvent.VK_S);
@@ -124,6 +129,7 @@ public class GifRenderApp extends JFrame {
         exitItem.addActionListener(e -> System.exit(0));
         exitItem.setMnemonic(KeyEvent.VK_E);
 
+        fileMenu.add(addItem);
         fileMenu.add(saveItem);
         fileMenu.add(loadItem);
         fileMenu.add(exitItem);
@@ -135,9 +141,38 @@ public class GifRenderApp extends JFrame {
     }
 
     // MODIFIES: this
+    // EFFECTS: prompts user to add files with a file chooser
+    private void addFiles() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(true);
+
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || IOUtils.isImageOrGif(f.getName());
+            }
+
+            @Override
+            public String getDescription() {
+                return "Images and GIFs";
+            }
+        });
+
+
+
+        if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File[] files = fileChooser.getSelectedFiles();
+
+            for (File file : files) {
+                addItem(file);
+            }
+        }
+    }
+
+    // MODIFIES: this
     // EFFECTS: refreshes the displayed roster
     private void updateRosterPanel() {
-//        rosterPanel.removeAll();
+        rosterPanel.removeAll();
 
         for (int i = 0; i < roster.getItems().size(); i++) {
             // inefficient, but backwards compatible with phase 2 model
@@ -285,12 +320,16 @@ public class GifRenderApp extends JFrame {
     // MODIFIES: this
     // EFFECTS: adds the file at inputPath to the roster
     private void addItem(String inputPath) {
-        Path path = Paths.get(inputPath);
-        File file = path.toFile();
+        addItem(Paths.get(inputPath).toFile());
+    }
 
+    // REQUIRES: file is a valid file
+    // MODIFIES: this
+    // EFFECTS: adds the file to the roster
+    private void addItem(File file) {
         try {
             if (!file.exists() || !IOUtils.isImageOrGif(file.getName())) {
-                throw new InvalidPathException(inputPath, "Invalid input path.");
+                throw new InvalidPathException(file.getPath(), "Invalid input path.");
             } else if (file.getName().toLowerCase().endsWith(".gif")) {
                 addGif(file);
             } else {
@@ -593,6 +632,8 @@ public class GifRenderApp extends JFrame {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        updateRosterPanel();
     }
 
     // MODIFIES: this
@@ -606,5 +647,7 @@ public class GifRenderApp extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        updateRosterPanel();
     }
 }

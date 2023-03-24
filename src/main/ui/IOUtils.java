@@ -23,7 +23,8 @@ public class IOUtils {
     // EFFECTS: returns true if name indicates an image or gif file
     public static boolean isImageOrGif(String name) {
         String n = name.toLowerCase();
-        return n.endsWith(".png") || n.endsWith(".jpg") || n.endsWith(".bmp") || n.endsWith(".gif");
+        return n.endsWith(".png") || n.endsWith(".jpg") || n.endsWith(".jpeg")
+                || n.endsWith(".bmp") || n.endsWith(".gif");
     }
 
     // EFFECTS: returns true if n is allowed as a file name
