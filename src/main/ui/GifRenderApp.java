@@ -53,11 +53,13 @@ public class GifRenderApp extends JFrame {
     public static final Color PANEL_COLOUR = new Color(100, 100, 105);
     public static final Color TEXT_COLOUR = new Color(210, 210, 215);
 
+    public static final int MAX_THUMB_HEIGHT = 150;
+    public static final int MAX_THUMB_WIDTH = 150;
+
     private JPanel rosterPanel;
     private JPanel buttonPanel;
 
-    public static final int MAX_THUMB_WIDTH = 150;
-    public static final int MAX_THUMB_HEIGHT = 150;
+    JMenu fileMenu;
 
     private JTextField inputField = new JTextField();
 
@@ -366,8 +368,18 @@ public class GifRenderApp extends JFrame {
     private JMenuBar initMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu fileMenu = new JMenu("File");
+        fileMenu = new JMenu("File");
+        initFileMenu();
+        fileMenu.setMnemonic(KeyEvent.VK_F);
 
+        menuBar.add(fileMenu);
+
+        return menuBar;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: initializes file menu
+    private void initFileMenu() {
         DropDownItem addItem = new DropDownItem("Add");
         addItem.addActionListener(e -> addFiles());
         addItem.setMnemonic(KeyEvent.VK_A);
@@ -380,6 +392,10 @@ public class GifRenderApp extends JFrame {
         loadItem.addActionListener(e -> loadRoster());
         loadItem.setMnemonic(KeyEvent.VK_L);
 
+        DropDownItem outputItem = new DropDownItem("Output");
+        outputItem.addActionListener(e -> saveFile());
+        outputItem.setMnemonic(KeyEvent.VK_O);
+
         DropDownItem exitItem = new DropDownItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
         exitItem.setMnemonic(KeyEvent.VK_E);
@@ -389,12 +405,9 @@ public class GifRenderApp extends JFrame {
         fileMenu.add(saveItem);
         fileMenu.add(loadItem);
         fileMenu.add(new JSeparator());
+        fileMenu.add(outputItem);
+        fileMenu.add(new JSeparator());
         fileMenu.add(exitItem);
-        fileMenu.setMnemonic(KeyEvent.VK_F);
-
-        menuBar.add(fileMenu);
-
-        return menuBar;
     }
 
     // MODIFIES: this

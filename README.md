@@ -34,3 +34,13 @@ so I decided this would be a good opportunity to create a new project that would
 - As a user, I want to be able to download one or more individual items from my roster
 - As a user, I want to be able to save the state of my roster for later
 - As a user, I want to be able to load my previously saved roster
+
+### Instructions for Grader
+
+- You can generate both required actions related to adding Xs to a Y by using the application normally
+  - Load images/GIFs to the roster by pressing the "Add" button, or File &#8594; Add (hotkey: alt+f &#8594; a), or by dragging and dropping images onto the roster.
+  - Perform various operations (shift, download, delay, etc.) on the roster items by selecting the desired operation from the dropdown, entering indices into the text field, and pressing the button.
+  - Output the roster as a GIF by pressing the "Output" button, or File &#8594; Output (hotkey: alt+f &#8594; o).
+- You can locate the visual components when you add files to the roster; you will see images displayed in the roster
+- You can save the state of my application by going to File &#8594; Save (hotkey: alt+f &#8594; s)
+- You can load the state of my application by going to File &#8594; Load (hotkey: alt+f &#8594; l)
