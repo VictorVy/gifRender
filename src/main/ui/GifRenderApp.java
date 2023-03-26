@@ -10,6 +10,7 @@ import persistence.JsonWriter;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -278,7 +279,7 @@ public class GifRenderApp extends JFrame {
         int i1 = Math.min(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
         int i2 = Math.max(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
 
-        JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
@@ -413,7 +414,7 @@ public class GifRenderApp extends JFrame {
     // MODIFIES: this
     // EFFECTS: prompts user to add files with a file chooser
     private void addFiles() {
-        JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         fileChooser.setMultiSelectionEnabled(true);
 
         fileChooser.setFileFilter(new FileFilter() {
@@ -444,7 +445,7 @@ public class GifRenderApp extends JFrame {
             return;
         }
 
-        JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         fileChooser.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
