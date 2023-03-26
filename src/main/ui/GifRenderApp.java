@@ -8,6 +8,7 @@ import persistence.JsonReader;
 import persistence.JsonWriter;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -58,6 +59,8 @@ public class GifRenderApp extends JFrame {
     public static final int MAX_THUMB_WIDTH = 150;
     public static final int MAX_THUMB_HEIGHT = 150;
 
+    private JTextField inputField = new JTextField();
+
     // EFFECTS: runs gifRender
     public GifRenderApp() {
         super("gifRender");
@@ -102,7 +105,8 @@ public class GifRenderApp extends JFrame {
         rosterScroll.getHorizontalScrollBar().setUnitIncrement(64);
 
         buttonPanel = new JPanel();
-        buttonPanel.setBackground(PANEL_COLOUR);
+        buttonPanelInit();
+
 
         add(rosterScroll, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.NORTH);
@@ -137,25 +141,246 @@ public class GifRenderApp extends JFrame {
     }
 
     // MODIFIES: this
+    // EFFECTS: initializes button panel
+    private void buttonPanelInit() {
+        buttonPanel.setBackground(PANEL_COLOUR);
+        buttonPanel.setLayout(new BorderLayout());
+        buttonPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
+
+        JButton addButton = new JButton("Add");
+        addButton.addActionListener(e -> addFiles());
+        addButton.setToolTipText("Add images and GIFs to the roster");
+
+        JButton outButton = new JButton("Output");
+        outButton.addActionListener(e -> saveFile());
+        outButton.setToolTipText("Output the roster as a gif");
+
+        buttonPanel.add(addButton, BorderLayout.WEST);
+        buttonPanel.add(centerButtonPanel(), BorderLayout.CENTER);
+        buttonPanel.add(outButton, BorderLayout.EAST);
+    }
+
+    private JPanel centerButtonPanel() {
+        JPanel centerPanel = new JPanel();
+        centerPanel.setBackground(PANEL_COLOUR);
+
+        JButton executeButton = new JButton("Remove");
+        executeButton.setPreferredSize(new Dimension(90, 25));
+        executeButton.setToolTipText("Execute operation");
+        executeButton.addActionListener(e -> executeCommand(executeButton.getText()));
+
+        DropDownItem removeItem = new DropDownItem("Remove");
+        DropDownItem swapItem = new DropDownItem("Swap");
+        DropDownItem shiftItem = new DropDownItem("Shift");
+        DropDownItem renameItem = new DropDownItem("Rename");
+        DropDownItem downloadItem = new DropDownItem("Download");
+        DropDownItem delayItem = new DropDownItem("Delay");
+        JComboBox<DropDownItem> opBox = new JComboBox<>(new DropDownItem[]{removeItem, swapItem, shiftItem,
+                renameItem, downloadItem, delayItem});
+        opBox.addActionListener(e -> executeButton.setText(opBox.getSelectedItem().toString()));
+        opBox.setPreferredSize(new Dimension(90, 25));
+        opBox.setToolTipText("Select operation to perform");
+
+        inputField.setPreferredSize(new Dimension(250, 25));
+        inputField.setToolTipText("Enter index, range of indices (i.e. \"0-19\"), or \"all\"");
+
+        centerPanel.add(opBox);
+        centerPanel.add(inputField);
+        centerPanel.add(executeButton);
+
+        return centerPanel;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: executes the command selected by the user
+    private void executeCommand(String command) {
+        String input = inputField.getText().trim();
+
+        try {
+            if (command.equals("Remove")) {
+                executeRemove(parseRange(input));
+            } else if (command.equals("Swap")) {
+                executeSwap(parseTwo(input));
+            } else if (command.equals("Shift")) {
+                executeShift(parseTwo(input));
+            } else if (command.equals("Rename")) {
+                executeRename(parseOne(input));
+            } else if (command.equals("Download")) {
+                executeDownload(parseRange(input));
+            } else if (command.equals("Delay")) {
+                executeDelay(parseRange(input));
+            }
+        } catch (UnsupportedOperationException e) {
+            JOptionPane.showMessageDialog(this, "Invalid input.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        updateRosterPanel();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: executes the remove command
+    private void executeRemove(String range) {
+        String[] indices = range.split("-");
+
+        int i1 = Math.min(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
+        int i2 = Math.max(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
+
+        for (int i = i1; i < i2; i++) {
+            roster.remove(i);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: executes the swap command
+    private void executeSwap(String twoIndices) {
+        String[] indices = twoIndices.split("-");
+
+        int i1 = Integer.parseInt(indices[0]);
+        int i2 = Integer.parseInt(indices[1]);
+
+        swapItems(i1 + " " + i2);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: executes the shift command
+    private void executeShift(String twoIndices) {
+        String[] indices = twoIndices.split("-");
+
+        int i1 = Integer.parseInt(indices[0]);
+        int i2 = Integer.parseInt(indices[1]);
+
+        shiftItems(i1 + " " + i2);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: executes the rename command
+    private void executeRename(int index) {
+        RosterItem ri = roster.getItem(index);
+        String oldName = ri.getName();
+
+        String newName = JOptionPane.showInputDialog(this, "Enter new name for " + oldName + ":");
+
+        if (!IOUtils.isLegalName(newName)) {
+            JOptionPane.showMessageDialog(this, "Invalid name.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        rename(ri, oldName, newName + oldName.substring(oldName.lastIndexOf('.')));
+    }
+
+    // MODIFIES: this
+    // EFFECTS: executes the download command
+    private void executeDownload(String range) {
+        String[] indices = range.split("-");
+
+        int i1 = Math.min(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
+        int i2 = Math.max(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
+
+        JFileChooser fileChooser = new JFileChooser();
+
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            try {
+                for (int i = i1; i < i2; i++) {
+                    RosterItem ri = roster.getItem(i);
+                    IOUtils.writeImage(ri.getImage(), fileChooser.getSelectedFile().getAbsolutePath(), ri.getName());
+                }
+            } catch (Exception e) {
+                throw new UnsupportedOperationException();
+            }
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: executes the delay command
+    private void executeDelay(String range) {
+        String[] indices = range.split("-");
+
+        int i1 = Math.min(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
+        int i2 = Math.max(Integer.parseInt(indices[0]), Integer.parseInt(indices[1]));
+
+        int delay;
+
+        try {
+            delay = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter delay (ms):"));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid delay.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        for (int i = i1; i < i2; i++) {
+            roster.getItem(i).setDelay(delay);
+        }
+    }
+
+    // EFFECTS: parses the input for the selection of one item
+    private int parseOne(String input) throws UnsupportedOperationException {
+        try {
+            if (Integer.parseInt(input) < 0 || Integer.parseInt(input) >= roster.size()) {
+                throw new UnsupportedOperationException();
+            }
+
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    // EFFECTS: parses the input for the selection of two items
+    private String parseTwo(String input) throws UnsupportedOperationException {
+        try {
+            String[] indices = input.split("-");
+
+            int i1 = Integer.parseInt(indices[0].trim());
+            int i2 = Integer.parseInt(indices[1].trim());
+
+            if (indices.length != 2 || i1 < 0 || i2 < 0 || i1 >= roster.size() || i2 >= roster.size() || i1 == i2) {
+                throw new UnsupportedOperationException();
+            }
+
+            return i1 + "-" + i2;
+        } catch (NumberFormatException e) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    // EFFECTS: parses the input for the selection of a range of items
+    private String parseRange(String input) throws UnsupportedOperationException {
+        try {
+            if (input.equals("all")) {
+                return "0-" + (roster.size() - 1);
+            } else if (input.contains("-")) {
+                return parseTwo(input);
+            } else {
+                return parseOne(input) + "-" + (Integer.parseInt(input) + 1);
+            }
+        } catch (NumberFormatException e) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+
+    // MODIFIES: this
     // EFFECTS: initializes menu bar
     private JMenuBar initMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu fileMenu = new JMenu("File");
 
-        JMenuItem addItem = new JMenuItem("Add");
+        DropDownItem addItem = new DropDownItem("Add");
         addItem.addActionListener(e -> addFiles());
         addItem.setMnemonic(KeyEvent.VK_A);
 
-        JMenuItem saveItem = new JMenuItem("Save");
+        DropDownItem saveItem = new DropDownItem("Save");
         saveItem.addActionListener(e -> saveRoster());
         saveItem.setMnemonic(KeyEvent.VK_S);
 
-        JMenuItem loadItem = new JMenuItem("Load");
+        DropDownItem loadItem = new DropDownItem("Load");
         loadItem.addActionListener(e -> loadRoster());
         loadItem.setMnemonic(KeyEvent.VK_L);
 
-        JMenuItem exitItem = new JMenuItem("Exit");
+        DropDownItem exitItem = new DropDownItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
         exitItem.setMnemonic(KeyEvent.VK_E);
 
@@ -197,6 +422,47 @@ public class GifRenderApp extends JFrame {
                 addItem(file);
             }
         }
+    }
+
+    // EFFECTS: prompts user to save the roster as a gif
+    private void saveFile() {
+        if (roster.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Empty roster", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getName().endsWith(".gif");
+            }
+
+            @Override
+            public String getDescription() {
+                return "GIFs";
+            }
+        });
+
+
+        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION
+                && checkName(fileChooser.getSelectedFile())) {
+            try {
+                IOUtils.writeGif(roster.getFrames(), fileChooser.getSelectedFile().getAbsolutePath());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    // EFFECTS: displays error dialog and returns false if file name is invalid, otherwise returns true
+    private boolean checkName(File file) {
+        if (!IOUtils.isLegalName(file.getName())) {
+            JOptionPane.showMessageDialog(null, "Invalid name", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
     }
 
     // MODIFIES: this
@@ -493,6 +759,12 @@ public class GifRenderApp extends JFrame {
         String newName = askName("Enter new name for " + oldName + ":")
                 + oldName.substring(oldName.lastIndexOf("."));
 
+        rename(ri, oldName, newName);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: renames the roster item at index i to newName, if no name collisions
+    private void rename(RosterItem ri, String oldName, String newName) {
         HashSet<String> names = new HashSet<>(roster.getNames());
         names.remove(oldName);
 
@@ -584,17 +856,21 @@ public class GifRenderApp extends JFrame {
     }
 
     // EFFECTS: outputs the roster to a specified path as a gif
-    private void outputRoster() throws Exception {
+    private void outputRoster() {
         if (rosterIsEmpty()) {
             return;
         }
 
-        String outputDir = askOutputDir();
-        String outputName = askName("Please specify output file name:");
+        try {
+            String outputDir = askOutputDir();
+            String outputName = askName("Please specify output file name:");
 
-        if (confirm("Output " + outputName + ".gif to " + outputDir + "?")) {
-            IOUtils.writeGif(roster.getFrames(), outputDir, outputName);
-            System.out.println(outputName + ".gif created in " + outputDir);
+            if (confirm("Output " + outputName + ".gif to " + outputDir + "?")) {
+                IOUtils.writeGif(roster.getFrames(), outputDir, outputName);
+                System.out.println(outputName + ".gif created in " + outputDir);
+            }
+        } catch (Exception e) {
+            System.out.println("Error outputting roster");
         }
     }
 

@@ -51,7 +51,18 @@ public class IOUtils {
 
     // EFFECTS: writes frames as a gif to outputDir, named outputName
     public static void writeGif(GIFFrame[] frames, String outputDir, String outputName) throws Exception {
-        FileOutputStream out = new FileOutputStream(outputDir + "/" + outputName + ".gif");
+        writeGif(frames, outputDir + "/" + outputName);
+    }
+
+    // EFFECTS: writes frames as a gif to outputDir, named outputName
+    public static void writeGif(GIFFrame[] frames, String path) throws Exception {
+        FileOutputStream out;
+
+        if (path.endsWith(".gif")) {
+            out = new FileOutputStream(path);
+        } else {
+            out = new FileOutputStream(path + ".gif");
+        }
 
         GIFTweaker.writeAnimatedGIF(frames, out);
 
