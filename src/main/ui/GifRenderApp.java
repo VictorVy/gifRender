@@ -52,6 +52,14 @@ public class GifRenderApp extends JFrame {
     // EFFECTS: runs gifRender
     public GifRenderApp() {
         super("gifRender");
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                 | UnsupportedLookAndFeelException e) {
+            throw new RuntimeException(e);
+        }
+
         init();
     }
 
