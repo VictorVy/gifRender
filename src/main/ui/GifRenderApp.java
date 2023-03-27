@@ -21,6 +21,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.file.InvalidPathException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -442,7 +443,7 @@ public class GifRenderApp extends JFrame {
         });
 
         if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            addItems(List.of(fileChooser.getSelectedFiles()));
+            addItems(Arrays.asList(fileChooser.getSelectedFiles()));
         }
     }
 
