@@ -10,6 +10,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// Unit tests for the ModelUtils class
 public class ModelUtilsTest {
     GIFFrame frame1 = new GIFFrame(new BufferedImage(100, 100, 1));
     GIFFrame frame2 = new GIFFrame(new BufferedImage(1920, 1080, 1));

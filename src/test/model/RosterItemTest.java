@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// Unit tests for the RosterItem class
 class RosterItemTest {
     RosterItem ri1;
     RosterItem ri2;

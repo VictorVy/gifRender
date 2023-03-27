@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// Unit tests for the Roster class
 class RosterTest {
     Roster roster;
     RosterItem ri1 = new RosterItem(new BufferedImage(100, 100, 1), "test1.png");
