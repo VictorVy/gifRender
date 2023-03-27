@@ -14,9 +14,14 @@ public class Roster implements Writable {
     ArrayList<RosterItem> items;
     HashSet<String> names;
 
+    EventLog log;
+
     public Roster() {
         items = new ArrayList<>();
         names = new HashSet<>();
+        log = EventLog.getInstance();
+
+        log.logEvent(new Event("Roster created"));
     }
 
     // MODIFIES: this
@@ -24,14 +29,20 @@ public class Roster implements Writable {
     public void add(RosterItem ri) {
         items.add(ri);
         names.add(ri.getName().toLowerCase());
+
+        log.logEvent(new Event("Added " + ri.getName() + " to the roster"));
     }
 
     // REQUIRES: 0 <= i < size();
     // MODIFIES: this
     // EFFECTS: removes the RosterItem at index i from the roster and its name from the name set
     public void remove(int i) {
-        names.remove(items.get(i).getName().toLowerCase());
+        String name = items.get(i).getName();
+
+        names.remove(name.toLowerCase());
         items.remove(i);
+
+        log.logEvent(new Event("Removed " + name + " from the roster"));
     }
 
     // MODIFIES: this
@@ -39,6 +50,8 @@ public class Roster implements Writable {
     public void clear() {
         items.clear();
         names.clear();
+
+        log.logEvent(new Event("Cleared the roster"));
     }
 
     // EFFECTS: returns true if the roster is empty
@@ -88,6 +101,8 @@ public class Roster implements Writable {
 
         items.add(s, rl);
         items.add(l, rs);
+
+        log.logEvent(new Event("Swapped " + rl.getName() + " and " + rs.getName()));
     }
 
     // REQUIRES: 0 <= a < size() and 0 <= b < size()
@@ -100,6 +115,8 @@ public class Roster implements Writable {
 
         RosterItem r = items.remove(a);
         items.add(b, r);
+
+        log.logEvent(new Event("Shifted " + r.getName() + " from index " + a + " to index " + b));
     }
 
     // EFFECTS: returns true if i is out of roster bounds
@@ -118,6 +135,8 @@ public class Roster implements Writable {
     public void rename(String name, String newName) {
         names.remove(name.toLowerCase());
         names.add(newName.toLowerCase());
+
+        log.logEvent(new Event("Renamed " + name + " to " + newName));
     }
 
     // EFFECTS: returns JSON representation of the roster

@@ -44,3 +44,36 @@ so I decided this would be a good opportunity to create a new project that would
 - You can locate the visual components when you add files to the roster; you will see images displayed in the roster
 - You can save the state of my application by going to File &#8594; Save (hotkey: alt+f &#8594; s)
 - You can load the state of my application by going to File &#8594; Load (hotkey: alt+f &#8594; l)
+
+### Phase 4: Task 2
+
+Sun Mar 26 22:52:09 PDT 2023<br>
+Roster created<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_0.png to the roster<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_1.png to the roster<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_2.png to the roster<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_3.png to the roster<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_4.png to the roster<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_5.png to the roster<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_6.png to the roster<br>
+Sun Mar 26 22:53:20 PDT 2023<br>
+Added nyan_7.png to the roster<br>
+Sun Mar 26 22:53:59 PDT 2023<br>
+Removed nyan_2.png from the roster<br>
+Sun Mar 26 22:53:59 PDT 2023<br>
+Removed nyan_3.png from the roster<br>
+Sun Mar 26 22:54:34 PDT 2023<br>
+Swapped nyan_7.png and nyan_0.png<br>
+Sun Mar 26 22:54:45 PDT 2023<br>
+Shifted nyan_1.png from index 1 to index 2<br>
+Sun Mar 26 22:55:00 PDT 2023<br>
+Renamed nyan_7.png to nyarn<br>
+Sun Mar 26 22:55:35 PDT 2023<br>
+Set delay of nyan_1.png to 20

@@ -20,6 +20,8 @@ public class RosterItem implements Writable {
     private int delay;
     private int transparency;
 
+    EventLog log;
+
     // EFFECTS: constructs a new RosterItem based on the given BufferedImage and name
     public RosterItem(BufferedImage image, String name) {
         this(new GIFFrame(image), name);
@@ -42,6 +44,8 @@ public class RosterItem implements Writable {
         height = image.getHeight();
         delay = frame.getDelay() * 10;
         transparency = frame.getTransparencyFlag();
+
+        log = EventLog.getInstance();
     }
 
     public BufferedImage getImage() {
@@ -83,6 +87,8 @@ public class RosterItem implements Writable {
         int d = (int) Math.round(delay / 10.0) * 10;
         this.delay = d;
         frame = ModelUtils.copyExceptDelay(frame, d);
+
+        log.logEvent(new Event("Set delay of " + name + " to " + d));
     }
 
     public int getTransparency() {

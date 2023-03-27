@@ -1,13 +1,3 @@
-next
-- add operationator
-    - remove files
-    - change delays
-    - change positions
-    - change names
-    - output
-- add instructions for grader
-- add alerts
-
 known bugs
 - top/left position jank
 - gifframe properties

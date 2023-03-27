@@ -267,9 +267,11 @@ public class GifRenderApp extends JFrame {
             ri.setName(newName);
             roster.rename(oldName, newName);
 
-            System.out.println(oldName + " has been renamed to " + newName);
+            JOptionPane.showMessageDialog(this, "Renamed " + oldName + " to " + newName + ".",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            System.out.println("An item named " + newName + " already exists!");
+            JOptionPane.showMessageDialog(this, "An item named " + newName + " already exists",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
