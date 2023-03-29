@@ -77,3 +77,12 @@ Sun Mar 26 22:55:00 PDT 2023<br>
 Renamed nyan_7.png to nyarn<br>
 Sun Mar 26 22:55:35 PDT 2023<br>
 Set delay of nyan_1.png to 20
+
+### Phase 4: Task 3
+
+First, the most obvious refactoring I would do is to delegate many of the responsibilities handled by the
+GifRenderApp class to other classes. For example, I might add a class to handle file opening/saving, and a class to
+handle alerts and dialogs. This would help the cohesion of my code. Additionally, I would also implement custom
+exceptions. This would not change the functionality of my program, but it would make it easier to debug and maintain.
+If I had more time, I would also try to use the Observer design pattern for my model, reducing repetition elsewhere in
+the code and making the programmer's life easier.
