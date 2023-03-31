@@ -1,15 +1,7 @@
 known bugs
 - top/left position jank
-- gifframe properties
 - downloads don't preserve transparency
 - rosterPane white edges
-- the FlowLayout + JScrollPanel is GIGA-BROKEN but i've spent far too many hours on trying to fix it already
+- the FlowLayout does not wrap inside JScrollPanel but i've spent far too many hours on trying to fix it already
 - file chooser doesn't display file thumbnails (thanks swing)
     - way too complex (https://stackoverflow.com/questions/4096433/making-jfilechooser-show-image-thumbnails)
-
-to ask
-- phase 4 task 3
-  - JFrame/JPanel extends? fields?
-  - no dependencies -> floatings? (Main??, utils, ItemPanel, local DropDownItems)
-  - up/down (Writable)
-  - Singleton field? and multiplicity
